@@ -65,164 +65,142 @@ const RiderLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden font-sans text-zinc-100">
-      
-      {/* --- Background Effects --- */}
-      {/* Yellow Spotlights */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#FFD700]/10 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-[#FFD700]/5 rounded-full blur-[100px]"></div>
-      </div>
+    <div className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden font-sans text-zinc-100 py-12">
 
-      {/* Grid Texture */}
-      <div className="absolute inset-0 opacity-[0.05]" 
-           style={{ 
-             backgroundImage: 'linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px)', 
-             backgroundSize: '30px 30px' 
-           }}>
-      </div>
+      {/* Subtle background accents */}
+      <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'linear-gradient(#111 1px, transparent 1px), linear-gradient(90deg, #111 1px, transparent 1px)', backgroundSize: '36px 36px' }} />
 
-      <div className="relative z-10 w-full max-w-md px-6 py-8">
-        
-        {/* --- Header Section --- */}
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center mb-6 relative">
-            {/* Hexagon Shape CSS */}
-            <div className="w-20 h-20 bg-[#FFD700] flex items-center justify-center transform rotate-45 rounded-xl shadow-[0_0_30px_rgba(255,215,0,0.3)]">
-                <Bike className="w-10 h-10 text-black transform -rotate-45" strokeWidth={2.5} />
+      <div className="relative z-10 w-full max-w-5xl mx-4 bg-zinc-900/70 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl grid md:grid-cols-2">
+
+        {/* Left hero panel (visible on md+) */}
+        <div className="hidden md:flex flex-col justify-center items-start p-12 bg-gradient-to-br from-zinc-900 via-black to-[#0b0b0b]">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-16 h-16 bg-[#FFD700] rounded-lg flex items-center justify-center shadow-lg">
+              <Bike className="w-8 h-8 text-black" strokeWidth={2.2} />
             </div>
-            
-            {/* Floating Status Dot */}
-            <div className="absolute -bottom-2 -right-2 bg-black border-2 border-zinc-900 rounded-full px-3 py-1 flex items-center gap-1.5 shadow-lg">
-                <div className="w-2 h-2 bg-[#FFD700] rounded-full animate-pulse"></div>
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Partner</span>
+            <div>
+              <h2 className="text-2xl font-extrabold text-white">Rider.Go</h2>
+              <p className="text-sm text-zinc-400 mt-1">Fleet Dashboard & Delivery Tools</p>
             </div>
           </div>
-          
-          <h1 className="text-4xl font-black tracking-tighter text-white mb-2 uppercase italic">
-            Rider<span style={{ color: THEME.yellow }}>.Go</span>
-          </h1>
-          <p className="text-zinc-500 font-medium">Logistics & Delivery Portal</p>
+
+          <h3 className="text-3xl font-black text-white leading-tight mb-4">Get back on the road faster</h3>
+          <p className="text-zinc-400 mb-6">Quick access to orders, navigation, and earnings — optimized for riders.</p>
+
+          <div className="flex flex-col gap-3 w-full max-w-xs">
+            <div className="flex items-center gap-3 bg-zinc-800/60 rounded-lg p-3">
+              <ShieldCheck className="w-5 h-5 text-[#FFD700]" />
+              <div className="text-sm text-zinc-300">Secure sign-in & verified payouts</div>
+            </div>
+            <div className="flex items-center gap-3 bg-zinc-800/40 rounded-lg p-3">
+              <Zap className="w-5 h-5 text-[#FFD700]" />
+              <div className="text-sm text-zinc-300">Fast dispatch & live updates</div>
+            </div>
+          </div>
         </div>
 
-        {/* --- Login Card --- */}
-        <div className="bg-zinc-900/80 backdrop-blur-md border border-zinc-800 rounded-2xl p-8 shadow-2xl relative group">
-          {/* Top Border Accent */}
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#FFD700] to-transparent opacity-50"></div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            
-            {/* Phone Field */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-[#FFD700] ml-1">Mobile Number</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Phone className="h-5 w-5 text-zinc-500" />
-                </div>
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  required
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="block w-full pl-11 pr-4 py-4 bg-black border border-zinc-800 rounded-lg text-white placeholder-zinc-700 focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700] transition-all"
-                  placeholder="000 000 0000"
-                />
+        {/* Right: login form panel */}
+        <div className="px-8 py-10 md:py-12 md:px-10">
+          <div className="text-center md:text-left mb-8">
+            <div className="inline-flex items-center justify-center mb-4">
+              <div className="w-14 h-14 bg-[#FFD700] flex items-center justify-center transform rotate-12 rounded-lg shadow-[0_6px_30px_rgba(255,215,0,0.12)]">
+                <Bike className="w-8 h-8 text-black -rotate-12" strokeWidth={2.3} />
               </div>
             </div>
+            <h1 className="text-3xl font-extrabold text-white mb-1">Rider Sign In</h1>
+            <p className="text-zinc-400">Enter your mobile number and password to continue</p>
+          </div>
 
-            {/* Password Field */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-[#FFD700] ml-1">Password</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-zinc-500" />
+          <div className="bg-zinc-900/60 backdrop-blur-sm border border-zinc-800 rounded-2xl p-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label htmlFor="phone" className="text-xs font-semibold uppercase tracking-wide text-zinc-400">Mobile number</label>
+                <div className="relative mt-2">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Phone className="h-5 w-5 text-zinc-500" />
+                  </div>
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    required
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="block w-full pl-11 pr-4 py-3 bg-black border border-zinc-800 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700]"
+                    placeholder="000 000 0000"
+                  />
                 </div>
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="block w-full pl-11 pr-12 py-4 bg-black border border-zinc-800 rounded-lg text-white placeholder-zinc-700 focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700] transition-all"
-                  placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-zinc-500 hover:text-[#FFD700] transition-colors" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-zinc-500 hover:text-[#FFD700] transition-colors" />
-                  )}
-                </button>
               </div>
-            </div>
 
-            {/* Extras */}
-            <div className="flex items-center justify-between pt-1">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={() => setRememberMe(!rememberMe)}
-                  className="h-4 w-4 rounded bg-zinc-800 border-zinc-700 text-[#FFD700] focus:ring-[#FFD700] focus:ring-offset-0 cursor-pointer accent-[#FFD700]"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-zinc-400 cursor-pointer hover:text-white transition-colors">
-                  Remember device
+              <div>
+                <label htmlFor="password" className="text-xs font-semibold uppercase tracking-wide text-zinc-400">Password</label>
+                <div className="relative mt-2">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-zinc-500" />
+                  </div>
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="block w-full pl-11 pr-12 py-3 bg-black border border-zinc-800 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:border-[#FFD700] focus:ring-1 focus:ring-[#FFD700]"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5 text-zinc-500 hover:text-[#FFD700] transition-colors" />
+                    ) : (
+                      <Eye className="h-5 w-5 text-zinc-500 hover:text-[#FFD700] transition-colors" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 text-sm text-zinc-400">
+                  <input
+                    id="remember-me"
+                    name="remember-me"
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={() => setRememberMe(!rememberMe)}
+                    className="h-4 w-4 rounded bg-zinc-800 border-zinc-700 text-[#FFD700] focus:ring-[#FFD700] accent-[#FFD700]"
+                  />
+                  Keep me signed in
                 </label>
+                <Link to="/rider/forgot-password" className="text-sm text-zinc-400 hover:text-[#FFD700]">Forgot?</Link>
               </div>
-              <Link
-                to="/rider/forgot-password"
-                className="text-sm font-semibold text-zinc-400 hover:text-[#FFD700] transition-colors"
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full flex items-center justify-center gap-3 py-3 bg-[#FFD700] text-black font-bold rounded-lg hover:bg-[#E6C200] transition-all disabled:opacity-70"
               >
-                Recover ID?
-              </Link>
+                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Sign In'}
+              </button>
+            </form>
+
+            <div className="mt-5 text-center border-t border-zinc-800 pt-4">
+              <p className="text-sm text-zinc-400">New to the fleet? <Link to="/rider/register" className="text-white font-semibold hover:text-[#FFD700]">Join now</Link></p>
             </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full relative flex items-center justify-center py-4 px-4 bg-[#FFD700] hover:bg-[#E6C200] text-black font-extrabold text-lg uppercase tracking-wide rounded-lg transition-all shadow-[0_5px_20px_rgba(255,215,0,0.2)] hover:shadow-[0_10px_30px_rgba(255,215,0,0.3)] transform hover:-translate-y-1 active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none mt-6"
-            >
-              {isLoading ? (
-                <Loader2 className="w-6 h-6 animate-spin" />
-              ) : (
-                <span className="flex items-center gap-2">
-                  Ignition <Zap className="w-5 h-5 fill-current" />
-                </span>
-              )}
-            </button>
-          </form>
-
-          {/* Registration Link */}
-          <div className="mt-8 text-center border-t border-zinc-800 pt-6">
-            <p className="text-zinc-500 text-sm">
-              New to the fleet?{' '}
-              <Link to="/rider/register" className="text-white font-bold hover:text-[#FFD700] transition-colors inline-flex items-center gap-1 group">
-                Join the Team <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </p>
           </div>
-        </div>
 
-        {/* --- Footer Trust Badge --- */}
-        <div className="mt-8 flex flex-col items-center gap-4">
-            <div className="flex items-center gap-2 text-zinc-600 text-[10px] uppercase tracking-widest border border-zinc-800 px-3 py-1 rounded-full">
-                <ShieldCheck className="w-3 h-3 text-[#FFD700]" />
-                <span>SSL Encrypted • 24/7 Monitoring</span>
+          <div className="mt-6 text-center md:text-left text-sm text-zinc-500">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-zinc-800/40 rounded-full">
+              <ShieldCheck className="w-4 h-4 text-[#FFD700]" />
+              <span>Secure • 24/7 monitoring</span>
             </div>
-            
-            <Link to="/" className="text-xs text-zinc-600 hover:text-white transition-colors">
-                ← Back to Main Store
-            </Link>
+            <div className="mt-3">
+              <Link to="/" className="text-xs text-zinc-500 hover:text-white">← Back to Main Store</Link>
+            </div>
+          </div>
         </div>
 
       </div>
