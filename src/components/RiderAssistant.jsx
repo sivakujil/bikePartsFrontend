@@ -1,3 +1,4 @@
+// components/RiderAssistant.js
 import React, { useState } from 'react';
 import {
   Fab, Box, Dialog, DialogTitle, DialogContent, DialogActions,
@@ -10,20 +11,22 @@ import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import StarIcon from '@mui/icons-material/Star';
 
+// மஞ்சள் நிற Pulse அனிமேஷன்
 const pulse = keyframes`
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
 `;
 
 const FloatingButton = styled(Fab)(() => ({
   position: 'fixed',
   bottom: 16,
   right: 16,
-  backgroundColor: '#38BDF8',
-  color: '#000',
+  backgroundColor: '#FFC107', // மஞ்சள்
+  color: '#000', // கருப்பு ஐகான்
+  zIndex: 1000,
   '&:hover': {
-    backgroundColor: '#0EA5E9',
+    backgroundColor: '#FFD54F',
   },
   animation: `${pulse} 2s infinite`,
 }));
@@ -34,19 +37,11 @@ const RiderAssistant = ({ rider, orders }) => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const pendingOrders = orders.filter(order => order.status === 'Assigned');
+  const pendingOrders = orders.filter(order => order.status === 'Assigned' || order.status === 'Picked Up');
   const completedToday = orders.filter(order =>
     order.status === 'Delivered' &&
     new Date(order.updatedAt).toDateString() === new Date().toDateString()
   ).length;
-
-  const tips = [
-    "Always confirm delivery address before pickup",
-    "Keep customer phone numbers handy for coordination",
-    "Update order status immediately after each action",
-    "Maintain a professional and friendly demeanor",
-    "Check vehicle documents and insurance regularly"
-  ];
 
   return (
     <>
@@ -62,44 +57,40 @@ const RiderAssistant = ({ rider, orders }) => {
         PaperProps={{
           sx: {
             borderRadius: '16px',
-            background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
-            color: '#F8FAFC'
+            background: 'linear-gradient(135deg, #121212 0%, #212121 100%)', // கருப்பு கிரேடியன்ட்
+            color: '#F8FAFC',
+            border: '1px solid #333'
           }
         }}
       >
-        <DialogTitle sx={{
-          textAlign: 'center',
-          fontWeight: 'bold',
-          fontSize: '1.5rem',
-          color: '#38BDF8'
-        }}>
+        <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold', fontSize: '1.5rem', color: '#FFC107' }}>
           <AssistantIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-          Rider Assistant
+          Rider Copilot
         </DialogTitle>
 
         <DialogContent>
-          {/* Rider Stats */}
+          {/* Stats Box */}
           <Box sx={{ mb: 3 }}>
-            <Typography variant="h6" sx={{ mb: 2, color: '#38BDF8' }}>
-              Your Performance Today
+            <Typography variant="h6" sx={{ mb: 2, color: '#FFC107' }}>
+              Today's Performance
             </Typography>
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
               <Chip
-                icon={<LocalShippingIcon />}
-                label={`${pendingOrders.length} Pending Orders`}
-                sx={{ bgcolor: '#F59E0B', color: '#000' }}
+                icon={<LocalShippingIcon style={{ color: '#000' }} />}
+                label={`${pendingOrders.length} Pending`}
+                sx={{ bgcolor: '#FFC107', color: '#000', fontWeight: 'bold' }}
               />
               <Chip
-                icon={<StarIcon />}
-                label={`${completedToday} Completed Today`}
-                sx={{ bgcolor: '#10B981', color: '#000' }}
+                icon={<StarIcon style={{ color: '#000' }} />}
+                label={`${completedToday} Delivered`}
+                sx={{ bgcolor: '#FFF', color: '#000' }}
               />
               <Chip
-                icon={<AccessTimeIcon />}
+                icon={<AccessTimeIcon style={{ color: rider?.isOnline ? '#000' : '#FFF' }} />}
                 label={rider?.isOnline ? "Online" : "Offline"}
                 sx={{
-                  bgcolor: rider?.isOnline ? '#10B981' : '#6B7280',
-                  color: '#000'
+                  bgcolor: rider?.isOnline ? '#4CAF50' : '#424242',
+                  color: rider?.isOnline ? '#000' : '#FFF'
                 }}
               />
             </Box>
@@ -109,81 +100,26 @@ const RiderAssistant = ({ rider, orders }) => {
 
           {/* Quick Actions */}
           <Box sx={{ mb: 3 }}>
-            <Typography variant="h6" sx={{ mb: 2, color: '#38BDF8' }}>
-              Quick Actions
+            <Typography variant="h6" sx={{ mb: 2, color: '#FFC107' }}>
+              Actions
             </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              {pendingOrders.length > 0 && (
-                <Button
-                  variant="outlined"
-                  sx={{
-                    borderColor: '#38BDF8',
-                    color: '#38BDF8',
-                    '&:hover': { borderColor: '#0EA5E9', bgcolor: 'rgba(56, 189, 248, 0.1)' }
-                  }}
-                  onClick={() => {
-                    // Could navigate to orders or perform bulk action
-                    handleClose();
-                  }}
-                >
-                  View All Pending Orders ({pendingOrders.length})
-                </Button>
-              )}
-              <Button
-                variant="outlined"
-                sx={{
-                  borderColor: '#10B981',
-                  color: '#10B981',
-                  '&:hover': { borderColor: '#059669', bgcolor: 'rgba(16, 185, 129, 0.1)' }
-                }}
-                onClick={() => {
-                  // Could open earnings/stats page
-                  handleClose();
-                }}
-              >
-                View Earnings & Stats
-              </Button>
-            </Box>
-          </Box>
-
-          <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', mb: 3 }} />
-
-          {/* Helpful Tips */}
-          <Box>
-            <Typography variant="h6" sx={{ mb: 2, color: '#38BDF8' }}>
-              Pro Tips for Success
-            </Typography>
-            <List>
-              {tips.map((tip, index) => (
-                <ListItem key={index} sx={{ px: 0 }}>
-                  <Avatar sx={{
-                    bgcolor: '#38BDF8',
-                    color: '#000',
-                    mr: 2,
-                    width: 24,
-                    height: 24,
-                    fontSize: '0.75rem'
-                  }}>
-                    {index + 1}
-                  </Avatar>
-                  <ListItemText
-                    primary={tip}
-                    primaryTypographyProps={{
-                      variant: 'body2',
-                      sx: { color: '#E2E8F0' }
-                    }}
-                  />
-                </ListItem>
-              ))}
-            </List>
+            <Button
+              variant="outlined"
+              fullWidth
+              sx={{
+                borderColor: '#FFC107',
+                color: '#FFC107',
+                '&:hover': { borderColor: '#FFF', bgcolor: 'rgba(255, 193, 7, 0.1)' }
+              }}
+              onClick={handleClose}
+            >
+              Back to Dashboard
+            </Button>
           </Box>
         </DialogContent>
 
         <DialogActions sx={{ p: 3, pt: 0 }}>
-          <Button
-            onClick={handleClose}
-            sx={{ color: '#94A3B8' }}
-          >
+          <Button onClick={handleClose} sx={{ color: '#94A3B8' }}>
             Close
           </Button>
         </DialogActions>
