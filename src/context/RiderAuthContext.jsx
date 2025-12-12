@@ -9,12 +9,27 @@ export const RiderAuthProvider = ({ children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem('riderToken');
+    const storedRider = localStorage.getItem('rider');
+
     if (token) {
-      // Verify token
-      api.get('/rider/profile')
-        .then(res => setRider(res.data.rider))
-        .catch(() => localStorage.removeItem('riderToken'))
-        .finally(() => setLoading(false));
+      if (storedRider) {
+        // Use stored rider data if available
+        setRider(JSON.parse(storedRider));
+        setLoading(false);
+      } else {
+        // Verify token and fetch rider data
+        api.get('/rider/profile')
+          .then(res => {
+            setRider(res.data.rider);
+            localStorage.setItem('rider', JSON.stringify(res.data.rider));
+          })
+          .catch(() => {
+            localStorage.removeItem('riderToken');
+            localStorage.removeItem('riderRefreshToken');
+            localStorage.removeItem('rider');
+          })
+          .finally(() => setLoading(false));
+      }
     } else {
       setLoading(false);
     }
@@ -24,12 +39,15 @@ export const RiderAuthProvider = ({ children }) => {
     const res = await api.post('/rider/auth/login', { phone, password });
     localStorage.setItem('riderToken', res.data.accessToken);
     localStorage.setItem('riderRefreshToken', res.data.refreshToken);
+    localStorage.setItem('rider', JSON.stringify(res.data.rider));
     setRider(res.data.rider);
     return res.data;
   };
 
   const logout = () => {
     localStorage.removeItem('riderToken');
+    localStorage.removeItem('riderRefreshToken');
+    localStorage.removeItem('rider');
     setRider(null);
   };
 
