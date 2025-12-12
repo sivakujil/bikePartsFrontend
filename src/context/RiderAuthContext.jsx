@@ -20,9 +20,10 @@ export const RiderAuthProvider = ({ children }) => {
     }
   }, []);
 
-  const login = async (email, password) => {
-    const res = await api.post('/rider/auth/login', { email, password });
-    localStorage.setItem('riderToken', res.data.token);
+  const login = async (phone, password) => {
+    const res = await api.post('/rider/auth/login', { phone, password });
+    localStorage.setItem('riderToken', res.data.accessToken);
+    localStorage.setItem('riderRefreshToken', res.data.refreshToken);
     setRider(res.data.rider);
     return res.data;
   };

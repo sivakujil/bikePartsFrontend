@@ -131,7 +131,7 @@ export default function Products() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { user } = useAuth();
-  const { addToCart } = useCart();
+  const { addItem } = useCart();
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -497,7 +497,7 @@ export default function Products() {
                           transition: 'transform 0.3s ease',
                           '&:hover': { transform: 'translateY(-8px)', zIndex: 2 }
                         }}>
-                           <ProductCard product={product} onAdded={(product) => addToCart(product._id, 1)} />
+                           <ProductCard product={product} onAdded={(product) => addItem(product._id, 1)} />
                         </Box>
                       </Box>
                     </Grid>

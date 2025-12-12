@@ -52,19 +52,27 @@ const RiderLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
-    if (!formData.phone || !formData.password) {
-      setError('Mobile number and Password required');
+
+    const phone = formData.phone.trim();
+    const password = formData.password.trim();
+
+    if (!phone || !password) {
+      setError('Mobile number and Password are required');
+      return;
+    }
+
+    if (phone.length < 10) {
+      setError('Please enter a valid mobile number');
       return;
     }
 
     setLoading(true);
     try {
-      const res = await login(formData.phone, formData.password);
-      if(res.success) {
+      const res = await login(phone, password);
+      if(res.accessToken) {
          navigate('/rider/dashboard');
       } else {
-         setError(res.message || 'Login Failed');
+         setError('Login Failed');
       }
     } catch (err) {
       setError('Invalid Credentials or Server Error');

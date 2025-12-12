@@ -55,7 +55,7 @@ const ProductCard = ({ product, onAdded }) => {
 
   const handleAddToCart = (e) => {
     e.stopPropagation(); // Prevent card click
-    if (onAdded) {
+    if (typeof onAdded === 'function') {
       onAdded(product);
     }
   };
