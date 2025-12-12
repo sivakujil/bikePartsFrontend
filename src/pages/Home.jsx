@@ -20,6 +20,7 @@ import CategoryNav from "../components/CategoryNav";
 import ProductCard from "../components/ProductCard";
 import ProductFilter from "../components/ProductFilter";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 
 // === 1. ANIMATIONS ===
 const float = keyframes`
@@ -140,6 +141,7 @@ export default function Home() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { } = useAuth();
+  const { addItem } = useCart();
 
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -200,7 +202,7 @@ export default function Home() {
   const handleFilterChange = (newFilters) => { setFilters(newFilters); setPagination(prev => ({ ...prev, page: 1 })); };
   const handleCategorySelect = (category) => { handleFilterChange({ ...filters, category: category === "All Parts" ? '' : category }); };
   const handlePageChange = (event, newPage) => { setPagination(prev => ({ ...prev, page: newPage })); window.scrollTo({ top: 600, behavior: 'smooth' }); };
-  const handleAdded = (product) => { console.log("Added:", product.name); };
+  const handleAdded = (product) => { addItem(product._id, 1); };
 
 
   return (
