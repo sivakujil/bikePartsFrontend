@@ -53,7 +53,7 @@ const RiderLogin = () => {
     e.preventDefault();
     setError('');
 
-    const phone = formData.phone.trim();
+    let phone = formData.phone.trim().replace(/\D/g, ''); // Remove all non-digit characters
     const password = formData.password.trim();
 
     if (!phone || !password) {
@@ -62,7 +62,7 @@ const RiderLogin = () => {
     }
 
     if (phone.length < 10) {
-      setError('Please enter a valid mobile number');
+      setError('Please enter a valid mobile number with at least 10 digits');
       return;
     }
 
