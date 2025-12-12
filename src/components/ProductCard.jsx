@@ -148,17 +148,57 @@ const ProductCard = ({ product, onAdded }) => {
         )}
 
         {/* Price */}
-        <Typography
-          variant="h6"
-          sx={{
-            color: THEME.primary,
-            fontWeight: 700,
-            fontSize: '1.1rem',
-            mb: 2,
-          }}
-        >
-          Rs {product.price?.toLocaleString()}
-        </Typography>
+        <Box sx={{ mb: 2 }}>
+          {product.discountPrice && product.discountPrice < product.price ? (
+            <>
+              {/* Original Price with line-through */}
+              <Typography
+                variant="body2"
+                sx={{
+                  color: THEME.textSecondary,
+                  textDecoration: 'line-through',
+                  fontSize: '0.9rem',
+                }}
+              >
+                Rs {product.price?.toLocaleString()}
+              </Typography>
+              {/* Discounted Price in bold */}
+              <Typography
+                variant="h6"
+                sx={{
+                  color: THEME.primary,
+                  fontWeight: 700,
+                  fontSize: '1.1rem',
+                }}
+              >
+                Rs {product.discountPrice?.toLocaleString()}
+              </Typography>
+              {/* Savings */}
+              <Typography
+                variant="caption"
+                sx={{
+                  color: THEME.accent,
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                }}
+              >
+                Save Rs {(product.price - product.discountPrice)?.toLocaleString()}
+                {product.discountPercentage && ` (${product.discountPercentage}% off)`}
+              </Typography>
+            </>
+          ) : (
+            <Typography
+              variant="h6"
+              sx={{
+                color: THEME.primary,
+                fontWeight: 700,
+                fontSize: '1.1rem',
+              }}
+            >
+              Rs {product.price?.toLocaleString()}
+            </Typography>
+          )}
+        </Box>
 
         {/* Category/Brand */}
         {(product.category || product.brand) && (
