@@ -46,7 +46,7 @@ const GlassCard = styled(Box)({
 const ProductImage = styled('img')({
   width: '100%',
   height: '100%',
-  maxHeight: '500px',
+  maxHeight: '400px',
   objectFit: 'contain',
   backgroundColor: '#1c1c1e', // Dark grey background for product image
   borderRadius: '20px',
@@ -126,9 +126,9 @@ export default function ProductDetails() {
                 </Breadcrumbs>
 
                 <Grid container spacing={6}>
-                    
+
                     {/* LEFT: IMAGE GALLERY */}
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={5}>
                         <Fade in={true} timeout={500}>
                             <Box position="relative">
                                 <ProductImage
@@ -136,12 +136,12 @@ export default function ProductDetails() {
                                     alt={product.name}
                                 />
                                 {product.quantity === 0 && (
-                                    <Chip 
-                                        label="SOLD OUT" 
-                                        sx={{ 
-                                            position: 'absolute', top: 20, left: 20, 
-                                            bgcolor: THEME.danger, color: '#fff', fontWeight: 'bold', px: 1 
-                                        }} 
+                                    <Chip
+                                        label="SOLD OUT"
+                                        sx={{
+                                            position: 'absolute', top: 20, left: 20,
+                                            bgcolor: THEME.danger, color: '#fff', fontWeight: 'bold', px: 1
+                                        }}
                                     />
                                 )}
                             </Box>
@@ -149,7 +149,7 @@ export default function ProductDetails() {
                     </Grid>
 
                     {/* RIGHT: DETAILS & ACTIONS */}
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={7}>
                         <Box>
                             <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                                 <Box>
