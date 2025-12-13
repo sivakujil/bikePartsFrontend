@@ -345,12 +345,15 @@ export default function Home() {
                 {pagination.pages > 1 && (
                   <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
                     <GlassPanel sx={{ py: 1, px: 3, borderRadius: '50px !important' }}>
-                        <StyledPagination 
-                          count={pagination.pages} 
-                          page={pagination.page} 
-                          onChange={handlePageChange} 
+                        <StyledPagination
+                          count={pagination.pages}
+                          page={pagination.page}
+                          onChange={handlePageChange}
                         />
                     </GlassPanel>
+                    <Typography variant="caption" color={THEME.textMuted} sx={{ mt: 2, textAlign: 'center' }}>
+                      Page {pagination.page} of {pagination.pages}
+                    </Typography>
                   </Box>
                 )}
               </>
