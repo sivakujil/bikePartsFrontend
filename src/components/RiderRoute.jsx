@@ -1,20 +1,17 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useRiderAuth } from '../context/RiderAuthContext';
 import { CircularProgress, Box } from '@mui/material';
 
-const RiderRoute = ({ children }) => {
-  const { rider, loading } = useRiderAuth();
+const RiderProtectedRoute = ({ children }) => {
+  const riderToken = localStorage.getItem('riderToken');
 
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-        <CircularProgress />
-      </Box>
-    );
+  // If no rider token, redirect to login
+  if (!riderToken) {
+    return <Navigate to="/rider/login" replace />;
   }
 
-  return rider ? children : <Navigate to="/rider/login" replace />;
+  // If token exists, render children (no loading state needed since we're not fetching data)
+  return children;
 };
 
-export default RiderRoute;
+export default RiderProtectedRoute;

@@ -6,7 +6,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { RiderAuthProvider } from "./context/RiderAuthContext";
 import { ThemeProvider as CustomThemeProvider } from "./context/ThemeContext";
 import AdminRoute from "./components/AdminRoute";
-import RiderRoute from "./components/RiderRoute";
+import RiderProtectedRoute from "./components/RiderRoute";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 // Components
@@ -110,21 +110,23 @@ function AppContent() {
         <Route path="/rider/login" element={<RiderLogin />} />
 
         {/* Protected Rider Routes */}
-        <Route path="/rider/dashboard" element={<RiderDashboard />} />
-        <Route path="/rider/orders" element={<RiderOrders />} />
-        <Route path="/rider/order/:id" element={<RiderOrderDetails />} />
-        <Route path="/rider/pickup/:id" element={<PickupPage />} />
-        <Route path="/rider/delivery/:id" element={<DeliveryPage />} />
-        <Route path="/rider/proof/:id" element={<ProofUpload />} />
-        <Route path="/rider/profile" element={<RiderProfile />} />
+        <Route element={<RiderProtectedRoute />}>
+          <Route path="/rider/dashboard" element={<RiderDashboard />} />
+          <Route path="/rider/orders" element={<RiderOrders />} />
+          <Route path="/rider/order/:id" element={<RiderOrderDetails />} />
+          <Route path="/rider/pickup/:id" element={<PickupPage />} />
+          <Route path="/rider/delivery/:id" element={<DeliveryPage />} />
+          <Route path="/rider/proof/:id" element={<ProofUpload />} />
+          <Route path="/rider/profile" element={<RiderProfile />} />
+        </Route>
 
         {/* Legacy Rider Route */}
         <Route
           path="/rider"
           element={
-            <RiderRoute>
+            <RiderProtectedRoute>
               <RiderHome />
-            </RiderRoute>
+            </RiderProtectedRoute>
           }
         />
       </Routes>
