@@ -9,6 +9,7 @@ export const RiderAuthProvider = ({ children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem('riderToken');
+    const refreshToken = localStorage.getItem('riderRefreshToken');
     const storedRider = localStorage.getItem('rider');
 
     if (token) {
@@ -23,10 +24,30 @@ export const RiderAuthProvider = ({ children }) => {
             setRider(res.data.rider);
             localStorage.setItem('rider', JSON.stringify(res.data.rider));
           })
-          .catch(() => {
-            localStorage.removeItem('riderToken');
-            localStorage.removeItem('riderRefreshToken');
-            localStorage.removeItem('rider');
+          .catch(async () => {
+            // Try to refresh token if available
+            if (refreshToken) {
+              try {
+                const refreshResponse = await api.post('/rider/auth/refresh', { refreshToken });
+                localStorage.setItem('riderToken', refreshResponse.data.accessToken);
+                // Retry fetching rider data
+                const res = await api.get('/rider/profile');
+                setRider(res.data.rider);
+                localStorage.setItem('rider', JSON.stringify(res.data.rider));
+              } catch (refreshError) {
+                // Refresh failed, clear all rider data
+                localStorage.removeItem('riderToken');
+                localStorage.removeItem('riderRefreshToken');
+                localStorage.removeItem('rider');
+                setRider(null);
+              }
+            } else {
+              // No refresh token, clear rider data
+              localStorage.removeItem('riderToken');
+              localStorage.removeItem('riderRefreshToken');
+              localStorage.removeItem('rider');
+              setRider(null);
+            }
           })
           .finally(() => setLoading(false));
       }

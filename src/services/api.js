@@ -10,7 +10,17 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken') || localStorage.getItem('riderToken');
+    // Determine which token to use based on the request URL
+    let token = null;
+
+    if (config.url.includes('/rider/') || config.url.includes('/rider-auth/')) {
+      // Rider-specific routes use riderToken
+      token = localStorage.getItem('riderToken');
+    } else {
+      // All other routes use authToken (user/admin)
+      token = localStorage.getItem('authToken');
+    }
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -26,21 +36,26 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Check which token was used for this request
-      const authToken = localStorage.getItem('authToken');
-      const riderToken = localStorage.getItem('riderToken');
+      // Determine which authentication failed based on the request URL
+      const isRiderRequest = error.config?.url?.includes('/rider/') || error.config?.url?.includes('/rider-auth/');
 
-      if (riderToken && !authToken) {
+      if (isRiderRequest) {
         // Rider authentication failed
         localStorage.removeItem('riderToken');
         localStorage.removeItem('riderRefreshToken');
         localStorage.removeItem('rider');
-        window.location.href = '/rider/login';
+        // Only redirect if we're on a rider page
+        if (window.location.pathname.startsWith('/rider')) {
+          window.location.href = '/rider/login';
+        }
       } else {
         // User authentication failed
         localStorage.removeItem('authToken');
         localStorage.removeItem('user');
-        window.location.href = '/login';
+        // Only redirect if we're on a user page
+        if (!window.location.pathname.startsWith('/rider') && !window.location.pathname.startsWith('/admin')) {
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(error);

@@ -103,14 +103,15 @@ export const AuthProvider = ({ children }) => {
       const response = await api.post("/auth/login", credentials);
       console.log("Login response:", response.status, response.data);
 
-      const { user: userData, token } = response.data;
+      const { user: userData, accessToken, refreshToken } = response.data;
 
-      if (!userData || !token) {
+      if (!userData || !accessToken) {
         throw new Error("Invalid server response");
       }
 
-      // Save token and user to localStorage
-      localStorage.setItem("authToken", token);
+      // Save tokens and user to localStorage
+      localStorage.setItem("authToken", accessToken);
+      localStorage.setItem("authRefreshToken", refreshToken);
       localStorage.setItem("user", JSON.stringify(userData));
 
       // Update context
@@ -131,14 +132,15 @@ export const AuthProvider = ({ children }) => {
   const googleLogin = async (code) => {
     try {
       const response = await api.post("/oauth/google", { code });
-      const { user: userData, token } = response.data;
+      const { user: userData, accessToken, refreshToken } = response.data;
 
-      if (!userData || !token) {
+      if (!userData || !accessToken) {
         throw new Error("Invalid server response");
       }
 
-      // Save token and user to localStorage
-      localStorage.setItem("authToken", token);
+      // Save tokens and user to localStorage
+      localStorage.setItem("authToken", accessToken);
+      localStorage.setItem("authRefreshToken", refreshToken);
       localStorage.setItem("user", JSON.stringify(userData));
 
       // Update context
@@ -149,6 +151,7 @@ export const AuthProvider = ({ children }) => {
       console.error("Google login failed:", error);
       // Clear any existing invalid data
       localStorage.removeItem("authToken");
+      localStorage.removeItem("authRefreshToken");
       localStorage.removeItem("user");
       throw error;
     }
@@ -157,14 +160,15 @@ export const AuthProvider = ({ children }) => {
   const facebookLogin = async (code) => {
     try {
       const response = await api.post("/oauth/facebook", { code });
-      const { user: userData, token } = response.data;
+      const { user: userData, accessToken, refreshToken } = response.data;
 
-      if (!userData || !token) {
+      if (!userData || !accessToken) {
         throw new Error("Invalid server response");
       }
 
-      // Save token and user to localStorage
-      localStorage.setItem("authToken", token);
+      // Save tokens and user to localStorage
+      localStorage.setItem("authToken", accessToken);
+      localStorage.setItem("authRefreshToken", refreshToken);
       localStorage.setItem("user", JSON.stringify(userData));
 
       // Update context
@@ -175,6 +179,7 @@ export const AuthProvider = ({ children }) => {
       console.error("Facebook login failed:", error);
       // Clear any existing invalid data
       localStorage.removeItem("authToken");
+      localStorage.removeItem("authRefreshToken");
       localStorage.removeItem("user");
       throw error;
     }
@@ -182,6 +187,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem("authToken");
+    localStorage.removeItem("authRefreshToken");
     localStorage.removeItem("user");
     setUser(null);
   };
@@ -190,6 +196,7 @@ export const AuthProvider = ({ children }) => {
     const initializeAuth = async () => {
       const storedUser = localStorage.getItem("user");
       const token = localStorage.getItem("authToken");
+      const refreshToken = localStorage.getItem("authRefreshToken");
 
       if (storedUser && token) {
         try {
@@ -197,9 +204,29 @@ export const AuthProvider = ({ children }) => {
           setUser(response.data);
           localStorage.setItem("user", JSON.stringify(response.data));
         } catch (error) {
-          localStorage.removeItem("authToken");
-          localStorage.removeItem("user");
-          setUser(null);
+          // Try to refresh token if available
+          if (refreshToken) {
+            try {
+              const refreshResponse = await api.post("/auth/refresh", { refreshToken });
+              localStorage.setItem("authToken", refreshResponse.data.accessToken);
+              // Retry the original request
+              const response = await api.get("/auth/me");
+              setUser(response.data);
+              localStorage.setItem("user", JSON.stringify(response.data));
+            } catch (refreshError) {
+              // Refresh failed, clear all auth data
+              localStorage.removeItem("authToken");
+              localStorage.removeItem("authRefreshToken");
+              localStorage.removeItem("user");
+              setUser(null);
+            }
+          } else {
+            // No refresh token, clear auth data
+            localStorage.removeItem("authToken");
+            localStorage.removeItem("authRefreshToken");
+            localStorage.removeItem("user");
+            setUser(null);
+          }
         }
       }
 
