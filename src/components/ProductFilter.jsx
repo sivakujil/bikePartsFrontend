@@ -6,7 +6,6 @@ import {
   Typography,
   Slider,
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
   Checkbox,
@@ -36,7 +35,8 @@ const ProductFilter = ({ onFilterChange, initialFilters = {} }) => {
   });
 
   const [priceRange, setPriceRange] = useState([1000, 50000]);
-  const [categories] = useState([
+
+  const categories = [
     'Engine Parts',
     'Brake System',
     'Suspension',
@@ -47,50 +47,43 @@ const ProductFilter = ({ onFilterChange, initialFilters = {} }) => {
     'Exhaust System',
     'Cooling System',
     'Accessories'
-  ]);
+  ];
 
-  const [brands] = useState([
-    'Bajaj',
-    'Yamaha',
-    'Honda',
-    'KTM',
-    'TVS'
-  ]);
+  const brands = ['Bajaj', 'Yamaha', 'Honda', 'KTM', 'TVS'];
 
-  const [sortOptions] = useState([
+  const sortOptions = [
     { value: 'newest', label: 'Newest First' },
     { value: 'price-low', label: 'Price: Low to High' },
     { value: 'price-high', label: 'Price: High to Low' },
     { value: 'rating', label: 'Highest Rated' },
     { value: 'name', label: 'Name: A-Z' }
-  ]);
+  ];
 
-  const [ratingOptions] = useState([
+  const ratingOptions = [
     { value: 4, label: '4+ Stars' },
     { value: 3, label: '3+ Stars' },
     { value: 2, label: '2+ Stars' },
     { value: 1, label: '1+ Stars' }
-  ]);
+  ];
 
-  // Update price range when min/max price changes
   useEffect(() => {
     setPriceRange([filters.minPrice, filters.maxPrice]);
   }, [filters.minPrice, filters.maxPrice]);
 
   const handleFilterChange = (field, value) => {
-    const newFilters = { ...filters, [field]: value };
-    setFilters(newFilters);
-    onFilterChange(newFilters);
+    const updated = { ...filters, [field]: value };
+    setFilters(updated);
+    onFilterChange(updated);
   };
 
-  const handlePriceRangeChange = (event, newValue) => {
+  const handlePriceChange = (_, newValue) => {
     setPriceRange(newValue);
     handleFilterChange('minPrice', newValue[0]);
     handleFilterChange('maxPrice', newValue[1]);
   };
 
   const handleReset = () => {
-    const resetFilters = {
+    const reset = {
       search: '',
       minPrice: 1000,
       maxPrice: 50000,
@@ -100,38 +93,31 @@ const ProductFilter = ({ onFilterChange, initialFilters = {} }) => {
       inStock: false,
       sort: 'newest'
     };
-    setFilters(resetFilters);
+    setFilters(reset);
     setPriceRange([1000, 50000]);
-    onFilterChange(resetFilters);
+    onFilterChange(reset);
   };
 
-  const getActiveFiltersCount = () => {
+  const activeCount = () => {
     let count = 0;
     if (filters.search) count++;
     if (filters.minPrice > 1000 || filters.maxPrice < 50000) count++;
     if (filters.category) count++;
     if (filters.brand) count++;
-    if (filters.minRating > 0) count++;
+    if (filters.minRating) count++;
     if (filters.inStock) count++;
     return count;
   };
 
-  // Add Product Funnction 
-
   return (
     <Card sx={{ position: 'sticky', top: 20 }}>
       <CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-          <FilterListIcon sx={{ mr: 1, color: 'primary.main' }} />
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <FilterListIcon sx={{ mr: 1 }} />
           <Typography variant="h6" fontWeight="bold">
             Filters
-            {getActiveFiltersCount() > 0 && (
-              <Chip 
-                label={getActiveFiltersCount()} 
-                size="small" 
-                color="primary" 
-                sx={{ ml: 1 }} 
-              />
+            {activeCount() > 0 && (
+              <Chip label={activeCount()} size="small" sx={{ ml: 1 }} />
             )}
           </Typography>
         </Box>
@@ -139,47 +125,43 @@ const ProductFilter = ({ onFilterChange, initialFilters = {} }) => {
         {/* Search */}
         <TextField
           fullWidth
-          label="Search Products"
-          variant="outlined"
           size="small"
+          label="Search Products"
           value={filters.search}
           onChange={(e) => handleFilterChange('search', e.target.value)}
-          sx={{ mb: 3 }}
+          sx={{ mb: 2 }}
         />
 
         {/* Price Range */}
         <Accordion defaultExpanded>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="subtitle1" fontWeight="medium">
-              Price Range
-            </Typography>
+            <Typography fontWeight="medium">Price Range</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <Box sx={{ px: 1, pt: 2 }}>
-              <Slider
-                value={priceRange}
-                onChange={handlePriceRangeChange}
-                valueLabelDisplay="auto"
-                min={1000}
-                max={50000}
-                step={1000}
-                marks={[
-                  { value: 1000, label: 'Rs 1000' },
-                  { value: 10000, label: 'Rs 10,000' },
-                  { value: 25000, label: 'Rs 25,000' },
-                  { value: 40000, label: 'Rs 40,000' },
-                  { value: 50000, label: 'Rs 50,000' }
-                ]}
-                sx={{ mb: 2 }}
-              />
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                <Typography variant="body2" color="text.secondary">
-                  Min: Rs {filters.minPrice}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Max: Rs {filters.maxPrice}
-                </Typography>
-              </Box>
+            <Slider
+              value={priceRange}
+              onChange={handlePriceChange}
+              min={1000}
+              max={50000}
+              step={1000}
+              valueLabelDisplay="auto"
+              valueLabelFormat={(v) => `Rs ${v.toLocaleString()}`}
+            />
+
+            {/* Clean Min / Max Display */}
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                mt: 1
+              }}
+            >
+              <Typography variant="caption">
+                Rs {priceRange[0].toLocaleString()}
+              </Typography>
+              <Typography variant="caption">
+                Rs {priceRange[1].toLocaleString()}
+              </Typography>
             </Box>
           </AccordionDetails>
         </Accordion>
@@ -187,21 +169,21 @@ const ProductFilter = ({ onFilterChange, initialFilters = {} }) => {
         {/* Category */}
         <Accordion>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="subtitle1" fontWeight="medium">
-              Category
-            </Typography>
+            <Typography fontWeight="medium">Category</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <FormControl fullWidth size="small">
               <Select
                 value={filters.category}
-                onChange={(e) => handleFilterChange('category', e.target.value)}
+                onChange={(e) =>
+                  handleFilterChange('category', e.target.value)
+                }
                 displayEmpty
               >
                 <MenuItem value="">All Categories</MenuItem>
-                {categories.map((category) => (
-                  <MenuItem key={category} value={category}>
-                    {category}
+                {categories.map((c) => (
+                  <MenuItem key={c} value={c}>
+                    {c}
                   </MenuItem>
                 ))}
               </Select>
@@ -212,21 +194,21 @@ const ProductFilter = ({ onFilterChange, initialFilters = {} }) => {
         {/* Brand */}
         <Accordion>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="subtitle1" fontWeight="medium">
-              Brand
-            </Typography>
+            <Typography fontWeight="medium">Brand</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <FormControl fullWidth size="small">
               <Select
                 value={filters.brand}
-                onChange={(e) => handleFilterChange('brand', e.target.value)}
+                onChange={(e) =>
+                  handleFilterChange('brand', e.target.value)
+                }
                 displayEmpty
               >
                 <MenuItem value="">All Brands</MenuItem>
-                {brands.map((brand) => (
-                  <MenuItem key={brand} value={brand}>
-                    {brand}
+                {brands.map((b) => (
+                  <MenuItem key={b} value={b}>
+                    {b}
                   </MenuItem>
                 ))}
               </Select>
@@ -237,21 +219,20 @@ const ProductFilter = ({ onFilterChange, initialFilters = {} }) => {
         {/* Rating */}
         <Accordion>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="subtitle1" fontWeight="medium">
-              Minimum Rating
-            </Typography>
+            <Typography fontWeight="medium">Minimum Rating</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <FormControl fullWidth size="small">
               <Select
                 value={filters.minRating}
-                onChange={(e) => handleFilterChange('minRating', e.target.value)}
-                displayEmpty
+                onChange={(e) =>
+                  handleFilterChange('minRating', e.target.value)
+                }
               >
                 <MenuItem value={0}>All Ratings</MenuItem>
-                {ratingOptions.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
+                {ratingOptions.map((r) => (
+                  <MenuItem key={r.value} value={r.value}>
+                    {r.label}
                   </MenuItem>
                 ))}
               </Select>
@@ -260,25 +241,23 @@ const ProductFilter = ({ onFilterChange, initialFilters = {} }) => {
         </Accordion>
 
         {/* In Stock */}
-        <Box sx={{ mt: 2, mb: 3 }}>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={filters.inStock}
-                onChange={(e) => handleFilterChange('inStock', e.target.checked)}
-                color="primary"
-              />
-            }
-            label="In Stock Only"
-          />
-        </Box>
+        <FormControlLabel
+          sx={{ mt: 1 }}
+          control={
+            <Checkbox
+              checked={filters.inStock}
+              onChange={(e) =>
+                handleFilterChange('inStock', e.target.checked)
+              }
+            />
+          }
+          label="In Stock Only"
+        />
 
         {/* Sort */}
         <Accordion>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="subtitle1" fontWeight="medium">
-              Sort By
-            </Typography>
+            <Typography fontWeight="medium">Sort By</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <FormControl fullWidth size="small">
@@ -286,9 +265,9 @@ const ProductFilter = ({ onFilterChange, initialFilters = {} }) => {
                 value={filters.sort}
                 onChange={(e) => handleFilterChange('sort', e.target.value)}
               >
-                {sortOptions.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
+                {sortOptions.map((s) => (
+                  <MenuItem key={s.value} value={s.value}>
+                    {s.label}
                   </MenuItem>
                 ))}
               </Select>
@@ -296,69 +275,8 @@ const ProductFilter = ({ onFilterChange, initialFilters = {} }) => {
           </AccordionDetails>
         </Accordion>
 
-        {/* Active Filters Display */}
-        {getActiveFiltersCount() > 0 && (
-          <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>
-              Active Filters:
-            </Typography>
-            <Stack direction="row" flexWrap="wrap" gap={1}>
-              {filters.search && (
-                <Chip 
-                  label={`Search: ${filters.search}`} 
-                  size="small" 
-                  onDelete={() => handleFilterChange('search', '')}
-                />
-              )}
-              {(filters.minPrice > 1000 || filters.maxPrice < 50000) && (
-                <Chip
-                  label={`Price: Rs ${filters.minPrice} - Rs ${filters.maxPrice}`}
-                  size="small"
-                  onDelete={() => {
-                    handleFilterChange('minPrice', 1000);
-                    handleFilterChange('maxPrice', 50000);
-                  }}
-                />
-              )}
-              {filters.category && (
-                <Chip 
-                  label={`Category: ${filters.category}`} 
-                  size="small" 
-                  onDelete={() => handleFilterChange('category', '')}
-                />
-              )}
-              {filters.brand && (
-                <Chip 
-                  label={`Brand: ${filters.brand}`} 
-                  size="small" 
-                  onDelete={() => handleFilterChange('brand', '')}
-                />
-              )}
-              {filters.minRating > 0 && (
-                <Chip 
-                  label={`Rating: ${filters.minRating}+ stars`} 
-                  size="small" 
-                  onDelete={() => handleFilterChange('minRating', 0)}
-                />
-              )}
-              {filters.inStock && (
-                <Chip 
-                  label="In Stock" 
-                  size="small" 
-                  onDelete={() => handleFilterChange('inStock', false)}
-                />
-              )}
-            </Stack>
-          </Box>
-        )}
-
-        {/* Reset Button */}
-        <Button
-          fullWidth
-          variant="outlined"
-          onClick={handleReset}
-          sx={{ mt: 2 }}
-        >
+        {/* Reset */}
+        <Button fullWidth variant="outlined" sx={{ mt: 2 }} onClick={handleReset}>
           Reset All Filters
         </Button>
       </CardContent>
