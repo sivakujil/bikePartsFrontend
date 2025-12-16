@@ -25,6 +25,7 @@ import {
   Settings,
   Menu as MenuIcon,
   Chat,
+  ShoppingCart,
 } from "@mui/icons-material";
 import { NavLink, Outlet } from "react-router-dom";
 
@@ -35,6 +36,7 @@ const menuItems = [
   { name: "Dashboard", path: "/admin", icon: <Dashboard /> },
   { name: "Orders", path: "/admin/orders", icon: <Assignment /> },
   { name: "Products", path: "/admin/products", icon: <Inventory2 /> },
+  { name: "Product Requests", path: "/admin/requests", icon: <ShoppingCart /> },
   { name: "Users", path: "/admin/users", icon: <People /> },
   { name: "Chat", path: "/admin/chat", icon: <Chat /> },
   { name: "Riders", path: "/admin/riders", icon: <DeliveryDining /> },
