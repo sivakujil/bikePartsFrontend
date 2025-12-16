@@ -4,16 +4,16 @@ import { styled, keyframes, alpha } from '@mui/system';
 import { CheckCircle, LocalShipping, ReceiptLong, ArrowForward, ShoppingBag, Email } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
 
-// === 1. THEME (Sleek Yellow & Black) ===
+
 const THEME = {
   bg: '#000000', // True Black
   glass: 'rgba(20, 20, 20, 0.9)', // Dark Glass
   glassBorder: 'rgba(255, 215, 0, 0.2)', // Yellow Border
   primary: '#FFD700', // Bright Yellow
   success: '#FFD700', // Yellow for Success (Theme consistent)
-  gold: '#FDB931', // Metallic Gold
+  gold: '#FDB931', 
   text: '#FFFFFF',
-  textMuted: '#9ca3af', // Cool Grey
+  textMuted: '#9ca3af', 
 };
 
 // === 2. ANIMATIONS ===

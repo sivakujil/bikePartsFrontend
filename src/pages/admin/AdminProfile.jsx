@@ -40,7 +40,7 @@ const AdminProfile = () => {
     stats: {
       inventory: "1,247",
       orders: "5,689",
-      revenue: "Rs 1.25 M"
+      revenue: "Lkr6000"
     }
   };
 

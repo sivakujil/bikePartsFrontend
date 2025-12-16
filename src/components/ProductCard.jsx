@@ -33,6 +33,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
   backdropFilter: 'blur(10px)',
   border: `1px solid ${THEME.border}`,
   borderRadius: '16px',
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
@@ -73,7 +74,7 @@ const ProductCard = ({ product, onAdded }) => {
   return (
     <StyledCard onClick={handleCardClick}>
       {/* Product Image */}
-      <Box sx={{ position: 'relative', paddingTop: '100%' }}>
+      <Box sx={{ position: 'relative', paddingTop: '80%' }}>
         <CardMedia
           component="img"
           image={imageUrl}
