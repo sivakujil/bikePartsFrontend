@@ -8,40 +8,33 @@ import {
   Box,
   Chip,
   Rating,
-  IconButton,
-  Tooltip,
 } from "@mui/material";
-import { styled } from '@mui/material/styles';
+import { styled } from "@mui/material/styles";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useNavigate } from "react-router-dom";
 
-// Theme colors (matching the app theme)
 const THEME = {
-  primary: '#FFD700', // Yellow
-  secondary: '#FDB931', // Gold
-  bgCard: '#1c1c1e',
-  textMain: '#FFFFFF',
-  textSecondary: '#9ca3af',
-  border: 'rgba(255, 255, 255, 0.1)',
-  accent: '#FF4B2B' // Red accent
+  primary: "#FFD700",
+  secondary: "#FDB931",
+  bgCard: "#1c1c1e",
+  textMain: "#FFFFFF",
+  textSecondary: "#9ca3af",
+  border: "rgba(255, 255, 255, 0.1)",
+  accent: "#FF4B2B",
 };
 
-// Styled Card with glass effect
-const StyledCard = styled(Card)(({ theme }) => ({
-  background: `linear-gradient(135deg, ${THEME.bgCard} 0%, rgba(28, 28, 30, 0.9) 100%)`,
-  backdropFilter: 'blur(10px)',
+const StyledCard = styled(Card)(() => ({
+  background: `linear-gradient(135deg, ${THEME.bgCard} 0%, rgba(28,28,30,0.9) 100%)`,
   border: `1px solid ${THEME.border}`,
-  borderRadius: '16px',
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
-  height: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  transition: 'all 0.3s ease',
-  cursor: 'pointer',
-  '&:hover': {
-    transform: 'translateY(-8px)',
-    boxShadow: `0 20px 40px rgba(255, 215, 0, 0.15)`,
+  borderRadius: "16px",
+  height: "100%",
+  display: "flex",
+  flexDirection: "column",
+  transition: "0.3s",
+  cursor: "pointer",
+  "&:hover": {
+    transform: "translateY(-6px)",
     borderColor: THEME.primary,
   },
 }));
@@ -50,189 +43,99 @@ const ProductCard = ({ product, onAdded }) => {
   const navigate = useNavigate();
   const [imageError, setImageError] = useState(false);
 
-  const handleCardClick = () => {
-    navigate(`/product/${product._id}`);
-  };
-
-  const handleAddToCart = (e) => {
-    e.stopPropagation(); // Prevent card click
-    if (typeof onAdded === 'function') {
-      onAdded(product);
-    }
-  };
-
-  const handleViewDetails = (e) => {
-    e.stopPropagation(); // Prevent card click
-    navigate(`/product/${product._id}`);
-  };
-
-  // Fallback image
-  const imageUrl = product.images?.[0] && !imageError
-    ? product.images[0]
-    : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDQwMCA0MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSIjMWMxYzFlIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMjIwIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiNGRkQ3MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk5vIEltYWdlPC90ZXh0Pgo8L3N2Zz4=';
+  const imageUrl =
+    product.images?.[0] && !imageError
+      ? product.images[0]
+      : "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFjMWMxZSI+PHRleHQgeD0iMTUwIiB5PSIxNjAiIGZpbGw9IiNGRkQ3MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==";
 
   return (
-    <StyledCard onClick={handleCardClick}>
-      {/* Product Image */}
-      <Box sx={{ position: 'relative', paddingTop: '80%' }}>
+    <StyledCard onClick={() => navigate(`/product/${product._id}`)}>
+      {/* SMALLER IMAGE AREA */}
+      <Box
+        sx={{
+          position: "relative",
+          height: 180,           // 🔹 Reduced image height
+          p: 2,                  // 🔹 Inner spacing
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <CardMedia
           component="img"
           image={imageUrl}
           alt={product.name}
           onError={() => setImageError(true)}
           sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            borderRadius: '16px 16px 0 0',
+            maxHeight: "100%",
+            maxWidth: "100%",
+            objectFit: "contain", // 🔹 Makes image smaller & neat
           }}
         />
 
-        {/* Stock Status Badge */}
-        <Box sx={{ position: 'absolute', top: 12, right: 12 }}>
-          <Chip
-            label={product.quantity > 0 ? 'In Stock' : 'Out of Stock'}
-            size="small"
-            sx={{
-              bgcolor: product.quantity > 0
-                ? 'rgba(255, 215, 0, 0.9)'
-                : 'rgba(244, 67, 54, 0.9)',
-              color: product.quantity > 0 ? '#000' : '#fff',
-              fontWeight: 'bold',
-              fontSize: '0.7rem',
-            }}
-          />
-        </Box>
+        <Chip
+          label={product.quantity > 0 ? "In Stock" : "Out of Stock"}
+          size="small"
+          sx={{
+            position: "absolute",
+            top: 12,
+            right: 12,
+            bgcolor:
+              product.quantity > 0
+                ? "rgba(255,215,0,0.9)"
+                : "rgba(244,67,54,0.9)",
+            color: product.quantity > 0 ? "#000" : "#fff",
+            fontWeight: "bold",
+            fontSize: "0.7rem",
+          }}
+        />
       </Box>
 
-      <CardContent sx={{ flexGrow: 1, p: 2, display: 'flex', flexDirection: 'column' }}>
-        {/* Product Name */}
+      <CardContent sx={{ flexGrow: 1, p: 2 }}>
         <Typography
-          variant="h6"
-          component="h2"
           sx={{
             color: THEME.textMain,
             fontWeight: 600,
-            fontSize: '1rem',
+            fontSize: "0.95rem",
             mb: 1,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            lineHeight: 1.3,
           }}
         >
           {product.name}
         </Typography>
 
-        {/* Rating */}
         {product.rating && (
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <Rating
-              value={product.rating}
-              readOnly
-              precision={0.5}
-              size="small"
-              sx={{
-                '& .MuiRating-iconFilled': { color: THEME.primary },
-                '& .MuiRating-iconEmpty': { color: 'rgba(255,255,255,0.2)' }
-              }}
-            />
-            <Typography variant="caption" sx={{ color: THEME.textSecondary, ml: 0.5 }}>
-              ({product.reviews || 0})
-            </Typography>
-          </Box>
+          <Rating
+            value={product.rating}
+            readOnly
+            size="small"
+            sx={{
+              mb: 1,
+              "& .MuiRating-iconFilled": { color: THEME.primary },
+            }}
+          />
         )}
 
-        {/* Price */}
-        <Box sx={{ mb: 2 }}>
-          {product.discountPrice && product.discountPrice < product.price ? (
-            <>
-              {/* Original Price with line-through */}
-              <Typography
-                variant="body2"
-                sx={{
-                  color: THEME.textSecondary,
-                  textDecoration: 'line-through',
-                  fontSize: '0.9rem',
-                }}
-              >
-                Rs {product.price?.toLocaleString()}
-              </Typography>
-              {/* Discounted Price in bold */}
-              <Typography
-                variant="h6"
-                sx={{
-                  color: THEME.primary,
-                  fontWeight: 700,
-                  fontSize: '1.1rem',
-                }}
-              >
-                Rs {product.discountPrice?.toLocaleString()}
-              </Typography>
-              {/* Savings */}
-              <Typography
-                variant="caption"
-                sx={{
-                  color: THEME.accent,
-                  fontWeight: 600,
-                  fontSize: '0.8rem',
-                }}
-              >
-                Save Rs {(product.price - product.discountPrice)?.toLocaleString()}
-                {product.discountPercentage && ` (${product.discountPercentage}% off)`}
-              </Typography>
-            </>
-          ) : (
-            <Typography
-              variant="h6"
-              sx={{
-                color: THEME.primary,
-                fontWeight: 700,
-                fontSize: '1.1rem',
-              }}
-            >
-              Rs {product.price?.toLocaleString()}
-            </Typography>
-          )}
-        </Box>
+        <Typography
+          sx={{
+            color: THEME.primary,
+            fontWeight: 700,
+            fontSize: "1rem",
+            mb: 1,
+          }}
+        >
+          Rs {product.discountPrice || product.price}
+        </Typography>
 
-        {/* Category/Brand */}
-        {(product.category || product.brand) && (
-          <Box sx={{ mb: 2 }}>
-            {product.category && (
-              <Typography variant="caption" sx={{ color: THEME.textSecondary, display: 'block' }}>
-                {product.category}
-              </Typography>
-            )}
-            {product.brand && (
-              <Typography variant="caption" sx={{ color: THEME.textSecondary, display: 'block' }}>
-                {product.brand}
-              </Typography>
-            )}
-          </Box>
-        )}
-
-        {/* Action Buttons */}
-        <Box sx={{ mt: 'auto', display: 'flex', gap: 1 }}>
+        <Box sx={{ display: "flex", gap: 1, mt: "auto" }}>
           <Button
             variant="outlined"
             size="small"
             startIcon={<VisibilityIcon />}
-            onClick={handleViewDetails}
-            sx={{
-              flex: 1,
-              borderColor: THEME.border,
-              color: THEME.textMain,
-              '&:hover': {
-                borderColor: THEME.primary,
-                bgcolor: 'rgba(255, 215, 0, 0.1)',
-              }
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/product/${product._id}`);
             }}
+            sx={{ flex: 1, color: THEME.textMain }}
           >
             View
           </Button>
@@ -241,20 +144,16 @@ const ProductCard = ({ product, onAdded }) => {
             variant="contained"
             size="small"
             startIcon={<ShoppingCartIcon />}
-            onClick={handleAddToCart}
             disabled={product.quantity <= 0}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAdded(product);
+            }}
             sx={{
               flex: 1,
               bgcolor: THEME.primary,
-              color: '#000',
-              fontWeight: 'bold',
-              '&:hover': {
-                bgcolor: THEME.secondary,
-              },
-              '&:disabled': {
-                bgcolor: 'rgba(255,255,255,0.1)',
-                color: 'rgba(255,255,255,0.3)',
-              }
+              color: "#000",
+              fontWeight: "bold",
             }}
           >
             Add
