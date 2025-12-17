@@ -141,9 +141,9 @@ export default function Dashboard() {
           api.get("/orders"), api.get("/products"), api.get("/admin/users"), api.get("/admin/riders"),
         ]);
 
-        const orders = ordersRes.data;
-        const products = productsRes.data;
-        const riders = ridersRes.data;
+        const orders = Array.isArray(ordersRes.data) ? ordersRes.data : [];
+        const products = Array.isArray(productsRes.data) ? productsRes.data : [];
+        const riders = Array.isArray(ridersRes.data) ? ridersRes.data : [];
 
         const todayOrders = orders.filter(order => new Date(order.createdAt).toDateString() === today.toDateString());
         const revenue24h = todayOrders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
@@ -261,7 +261,7 @@ export default function Dashboard() {
                 <Typography variant="h6" fontWeight={700}>Revenue Analytics</Typography>
                 <Chip label="Last 7 Days" size="small" sx={{ bgcolor: alpha(THEME.primary, 0.2), color: THEME.primary }} />
               </Box>
-              <Box height={300} width="100%">
+              <Box height={300} width="100%" sx={{ minHeight: 300 }}>
                 <ResponsiveContainer>
                   <AreaChart data={salesData}>
                     <defs>
@@ -304,7 +304,7 @@ export default function Dashboard() {
                       <TableRow key={order._id}>
                         <TableCell>
                            <Typography variant="body2" fontWeight={700} color={THEME.primary}>
-                             #{order._id.slice(-6).toUpperCase()}
+                             #{order._id?.slice(-6)?.toUpperCase() || 'N/A'}
                            </Typography>
                         </TableCell>
                         <TableCell>
@@ -315,7 +315,7 @@ export default function Dashboard() {
                              {order.user_id?.name || order.shippingAddress?.name || 'Guest'}
                           </Box>
                         </TableCell>
-                        <TableCell>Rs {order.totalAmount?.toLocaleString()}</TableCell>
+                        <TableCell>Rs {order.totalAmount?.toLocaleString() || '0'}</TableCell>
                         <TableCell>
                           <StatusBadge 
                             label={order.status} 
@@ -349,15 +349,15 @@ export default function Dashboard() {
                     <ListItem key={rider._id} sx={{ px: 0 }}>
                       <ListItemAvatar>
                         <Box position="relative">
-                           <Avatar src={rider.avatar} sx={{ bgcolor: THEME.primary }}>{rider.name[0]}</Avatar>
+                           <Avatar src={rider.avatar} sx={{ bgcolor: THEME.primary }}>{rider.name?.[0] || 'R'}</Avatar>
                            <Box position="absolute" bottom={0} right={0}>
                              <OnlineIndicator />
                            </Box>
                         </Box>
                       </ListItemAvatar>
-                      <ListItemText 
-                        primary={<Typography fontWeight={600}>{rider.name}</Typography>}
-                        secondary={<Typography variant="caption" color={THEME.textMuted}>{rider.vehicleType}</Typography>}
+                      <ListItemText
+                        primary={<Typography fontWeight={600}>{rider.name || 'Unknown Rider'}</Typography>}
+                        secondary={<Typography variant="caption" color={THEME.textMuted}>{rider.vehicleType || 'N/A'}</Typography>}
                       />
                       <Chip label="Active" size="small" sx={{ bgcolor: alpha(THEME.success, 0.2), color: THEME.success, height: 20 }} />
                     </ListItem>
@@ -372,7 +372,7 @@ export default function Dashboard() {
             {/* ORDER SUMMARY DONUT (Simulated with Bar for now) */}
             <GlassCard>
               <Typography variant="h6" fontWeight={700} mb={2}>Order Status</Typography>
-              <Box height={200} width="100%">
+              <Box height={200} width="100%" sx={{ minHeight: 200 }}>
                 <ResponsiveContainer>
                   <BarChart data={[
                     { name: 'Delivered', val: stats.deliveredOrders },
