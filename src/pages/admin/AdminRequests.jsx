@@ -11,7 +11,7 @@ import {
   Shield, TwoWheeler, Delete, VerifiedUser, Block, CheckCircle, Pending, Schedule
 } from "@mui/icons-material";
 import { format } from "date-fns";
-import api from "../../services/api";
+import { getAllProductRequests, replyToProductRequest } from "../../services/productRequestService";
 
 // === 1. THEME CONFIGURATION ===
 const THEME = {
@@ -120,10 +120,8 @@ export default function ProductRequests() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [tabValue, setTabValue] = useState(0);
-  const [statusDialog, setStatusDialog] = useState(false);
   const [replyDialog, setReplyDialog] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
-  const [newStatus, setNewStatus] = useState("");
   const [replyMessage, setReplyMessage] = useState("");
 
   useEffect(() => { loadRequests(); }, []);
@@ -132,8 +130,8 @@ export default function ProductRequests() {
   const loadRequests = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/product-requests");
-      setRequests(response.data.requests || []);
+      const response = await getAllProductRequests();
+      setRequests(response.requests || []);
     } catch (error) { console.error(error); }
     finally { setLoading(false); }
   };
@@ -142,15 +140,14 @@ export default function ProductRequests() {
     let filtered = [...requests];
 
     // Tab Filter
-    if (tabValue === 1) filtered = filtered.filter(r => r.status === 'pending');
-    if (tabValue === 2) filtered = filtered.filter(r => r.status === 'approved');
-    if (tabValue === 3) filtered = filtered.filter(r => r.status === 'rejected');
+    if (tabValue === 1) filtered = filtered.filter(r => r.status === 'Pending');
+    if (tabValue === 2) filtered = filtered.filter(r => r.status === 'Replied');
 
     // Search Filter
     if (search) {
       filtered = filtered.filter(request =>
         request.productName?.toLowerCase().includes(search.toLowerCase()) ||
-        request.description?.toLowerCase().includes(search.toLowerCase()) ||
+        request.userMessage?.toLowerCase().includes(search.toLowerCase()) ||
         request.userId?.name?.toLowerCase().includes(search.toLowerCase()) ||
         request.userId?.email?.toLowerCase().includes(search.toLowerCase())
       );
@@ -158,25 +155,14 @@ export default function ProductRequests() {
     setFilteredRequests(filtered);
   };
 
-  const handleUpdateStatus = async () => {
-    if (!selectedRequest || !newStatus) return;
-    try {
-      await api.put(`/product-requests/${selectedRequest._id}/status`, { status: newStatus });
-      loadRequests();
-      setStatusDialog(false);
-      setSelectedRequest(null);
-      setNewStatus("");
-    } catch (error) { console.error(error); }
-  };
 
   const handleReply = async () => {
-    if (!selectedRequest || !newStatus || !replyMessage.trim()) return;
+    if (!selectedRequest || !replyMessage.trim()) return;
     try {
-      await api.put(`/product-requests/${selectedRequest._id}/reply`, { status: newStatus, replyMessage });
+      await replyToProductRequest(selectedRequest._id, replyMessage);
       loadRequests();
       setReplyDialog(false);
       setSelectedRequest(null);
-      setNewStatus("");
       setReplyMessage("");
     } catch (error) { console.error(error); }
   };
@@ -189,42 +175,33 @@ export default function ProductRequests() {
     } catch (error) { console.error(error); }
   };
 
-  const openStatusDialog = (request) => {
-    setSelectedRequest(request);
-    setNewStatus(request.status);
-    setStatusDialog(true);
-  };
 
   const openReplyDialog = (request) => {
     setSelectedRequest(request);
-    setNewStatus(request.status);
-    setReplyMessage(request.replyMessage || "");
+    setReplyMessage(request.adminReply || "");
     setReplyDialog(true);
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "approved": return THEME.success;
-      case "rejected": return THEME.error;
-      case "pending": return THEME.primary;
+      case "Replied": return THEME.success;
+      case "Pending": return THEME.primary;
       default: return THEME.textMuted;
     }
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case "approved": return <CheckCircle fontSize="small" />;
-      case "rejected": return <Block fontSize="small" />;
-      case "pending": return <Pending fontSize="small" />;
+      case "Replied": return <CheckCircle fontSize="small" />;
+      case "Pending": return <Pending fontSize="small" />;
       default: return null;
     }
   };
 
   const stats = {
     total: requests.length,
-    pending: requests.filter(r => r.status === 'pending').length,
-    approved: requests.filter(r => r.status === 'approved').length,
-    rejected: requests.filter(r => r.status === 'rejected').length
+    pending: requests.filter(r => r.status === 'Pending').length,
+    replied: requests.filter(r => r.status === 'Replied').length
   };
 
   if (loading) return <Box sx={{ bgcolor: THEME.bg, height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}><LinearProgress sx={{ width: 200, color: THEME.primary }} /></Box>;
@@ -246,10 +223,9 @@ export default function ProductRequests() {
           {[
             { label: 'Total Requests', val: stats.total, icon: <Person />, color: THEME.primary },
             { label: 'Pending', val: stats.pending, icon: <Pending />, color: THEME.primary },
-            { label: 'Approved', val: stats.approved, icon: <CheckCircle />, color: THEME.success },
-            { label: 'Rejected', val: stats.rejected, icon: <Block />, color: THEME.error },
+            { label: 'Replied', val: stats.replied, icon: <CheckCircle />, color: THEME.success },
           ].map((item, idx) => (
-            <Grid item xs={12} sm={6} md={3} key={idx}>
+            <Grid item xs={12} sm={6} md={4} key={idx}>
               <GlassCard sx={{ p: 3 }}>
                 <StatBox color={item.color}>
                   <Box>
@@ -271,8 +247,7 @@ export default function ProductRequests() {
             <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} TabIndicatorProps={{ sx: { bgcolor: THEME.primary } }}>
               <CustomTab label="All Requests" />
               <CustomTab label="Pending" />
-              <CustomTab label="Approved" />
-              <CustomTab label="Rejected" />
+              <CustomTab label="Replied" />
             </Tabs>
 
             <SearchField
@@ -308,7 +283,7 @@ export default function ProductRequests() {
                           {request.productName}
                         </Typography>
                         <Typography variant="caption" color={THEME.textMuted} sx={{ display: 'block', mt: 0.5 }}>
-                          {request.message.length > 100 ? `${request.message.substring(0, 100)}...` : request.message}
+                          {request.userMessage && (request.userMessage.length > 100 ? `${request.userMessage.substring(0, 100)}...` : request.userMessage)}
                         </Typography>
                       </Box>
                     </TableCell>
@@ -349,11 +324,6 @@ export default function ProductRequests() {
                             <Edit fontSize="small" />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="Update Status Only">
-                          <IconButton size="small" onClick={() => openStatusDialog(request)} sx={{ color: THEME.warning }}>
-                            <Schedule fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
                         <Tooltip title="Delete Request">
                           <IconButton size="small" sx={{ color: THEME.error }} onClick={() => handleDeleteRequest(request._id)}>
                             <Delete fontSize="small" />
@@ -374,53 +344,6 @@ export default function ProductRequests() {
           )}
         </GlassCard>
 
-        {/* STATUS UPDATE DIALOG */}
-        <Dialog
-          open={statusDialog}
-          onClose={() => setStatusDialog(false)}
-          maxWidth="sm"
-          fullWidth
-          PaperProps={{
-            sx: {
-              bgcolor: '#1E293B',
-              color: '#fff',
-              borderRadius: '20px',
-              border: `1px solid ${THEME.glassBorder}`
-            }
-          }}
-        >
-          <DialogTitle sx={{ fontWeight: 700, borderBottom: `1px solid ${THEME.glassBorder}` }}>
-            Update Request Status
-          </DialogTitle>
-          <DialogContent sx={{ mt: 2 }}>
-            <Typography variant="body2" color={THEME.textMuted} sx={{ mb: 2 }}>
-              Product: {selectedRequest?.productName}
-            </Typography>
-            <FormControl fullWidth variant="filled">
-              <InputLabel sx={{ color: THEME.textMuted }}>Status</InputLabel>
-              <Select
-                value={newStatus}
-                onChange={(e) => setNewStatus(e.target.value)}
-                sx={{ color: '#fff', bgcolor: alpha('#fff', 0.05), '& .MuiSvgIcon-root': {color: '#fff'} }}
-                MenuProps={{ PaperProps: { sx: { bgcolor: '#1E293B', color: '#fff' } } }}
-              >
-                <MenuItem value="pending">Pending</MenuItem>
-                <MenuItem value="approved">Approved</MenuItem>
-                <MenuItem value="rejected">Rejected</MenuItem>
-              </Select>
-            </FormControl>
-          </DialogContent>
-          <DialogActions sx={{ p: 3, borderTop: `1px solid ${THEME.glassBorder}` }}>
-            <Button onClick={() => setStatusDialog(false)} sx={{ color: THEME.textMuted }}>Cancel</Button>
-            <Button
-              variant="contained"
-              onClick={handleUpdateStatus}
-              sx={{ bgcolor: THEME.primary, color: '#000', fontWeight: 'bold' }}
-            >
-              Update Status
-            </Button>
-          </DialogActions>
-        </Dialog>
 
         {/* REPLY DIALOG */}
         <Dialog
@@ -445,21 +368,8 @@ export default function ProductRequests() {
               Product: {selectedRequest?.productName}
             </Typography>
             <Typography variant="body2" color={THEME.textMuted} sx={{ mb: 2 }}>
-              User Message: {selectedRequest?.message}
+              User Message: {selectedRequest?.userMessage || "No message"}
             </Typography>
-            <FormControl fullWidth variant="filled" sx={{ mb: 2 }}>
-              <InputLabel sx={{ color: THEME.textMuted }}>Status</InputLabel>
-              <Select
-                value={newStatus}
-                onChange={(e) => setNewStatus(e.target.value)}
-                sx={{ color: '#fff', bgcolor: alpha('#fff', 0.05), '& .MuiSvgIcon-root': {color: '#fff'} }}
-                MenuProps={{ PaperProps: { sx: { bgcolor: '#1E293B', color: '#fff' } } }}
-              >
-                <MenuItem value="pending">Pending</MenuItem>
-                <MenuItem value="approved">Approved</MenuItem>
-                <MenuItem value="rejected">Rejected</MenuItem>
-              </Select>
-            </FormControl>
             <TextField
               fullWidth
               multiline

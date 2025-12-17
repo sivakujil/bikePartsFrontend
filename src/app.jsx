@@ -28,6 +28,7 @@ import Orders from "./pages/Orders";
 import OrderDetails from "./pages/OrderDetails";
 import UserProfile from "./pages/UserProfile";
 import ChatScreen from "./pages/ChatScreen";
+import MyRequests from "./pages/MyRequests";
 
 // Admin Components
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -39,7 +40,7 @@ import Riders from "./pages/admin/Riders";
 import Reports from "./pages/admin/Reports";
 import Users from "./pages/admin/Users";
 import Chat from "./pages/admin/Chat";
-import ProductRequests from "./pages/admin/ProductRequests";
+import AdminRequests from "./pages/admin/AdminRequests";
 import Settings from "./pages/admin/Settings";
 import AdminProfile from "./pages/admin/AdminProfile";
 import ThemeAssistant from "./components/ThemeAssistant";
@@ -80,6 +81,7 @@ function AppContent() {
           <Route path="/orders" element={<Orders />} />
           <Route path="/orders/:id" element={<OrderDetails />} />
           <Route path="/profile" element={<UserProfile />} />
+          <Route path="/requests" element={<MyRequests />} />
           <Route path="/chat" element={<ChatScreen />} />
         </Route>
 
@@ -97,7 +99,7 @@ function AppContent() {
           <Route path="products/add" element={<ProductForm />} />
           <Route path="products/edit/:id" element={<ProductForm />} />
           <Route path="orders" element={<AdminOrders />} />
-          <Route path="requests" element={<ProductRequests />} />
+          <Route path="requests" element={<AdminRequests />} />
           <Route path="riders" element={<Riders />} />
           <Route path="reports" element={<Reports />} />
           <Route path="users" element={<Users />} />

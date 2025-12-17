@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { 
-  Container, Typography, Box, Button, Grid, Chip, Rating, Alert, 
-  CircularProgress, Stack, Divider, IconButton, Fade, Breadcrumbs, Link 
+import {
+  Container, Typography, Box, Button, Grid, Chip, Rating, Alert,
+  CircularProgress, Stack, Divider, IconButton, Fade, Breadcrumbs, Link,
+  TextField, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar
 } from "@mui/material";
 import { styled } from '@mui/system';
-import { 
-  ShoppingCart, ArrowBack, FavoriteBorder, Share, 
-  LocalShipping, VerifiedUser, Home 
+import {
+  ShoppingCart, ArrowBack, FavoriteBorder, Share,
+  LocalShipping, VerifiedUser, Home, Notifications
 } from "@mui/icons-material";
 import api from "../services/api";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 // === 1. THEME (Sleek Yellow & Black) ===
 const THEME = {
@@ -82,7 +84,12 @@ export default function ProductDetails() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [adding, setAdding] = useState(false);
+    const [requestDialog, setRequestDialog] = useState(false);
+    const [userMessage, setUserMessage] = useState("");
+    const [requesting, setRequesting] = useState(false);
+    const [snackbar, setSnackbar] = useState({ open: false, message: "" });
     const { addItem } = useCart();
+    const { user } = useAuth();
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -107,6 +114,28 @@ export default function ProductDetails() {
             setError("Failed to add to cart");
         } finally {
             setAdding(false);
+        }
+    };
+
+    const handleRequestProduct = async () => {
+        if (!user) {
+            setError("Please login to request products");
+            return;
+        }
+        setRequesting(true);
+        try {
+            await api.post("/requests/create", {
+                productId: product._id,
+                productName: product.name,
+                userMessage
+            });
+            setSnackbar({ open: true, message: "Request sent to admin" });
+            setRequestDialog(false);
+            setUserMessage("");
+        } catch (err) {
+            setError("Failed to send request");
+        } finally {
+            setRequesting(false);
         }
     };
 
@@ -137,7 +166,7 @@ export default function ProductDetails() {
                                 />
                                 {product.quantity === 0 && (
                                     <Chip
-                                        label="SOLD OUT"
+                                        label="Out of Stock"
                                         sx={{
                                             position: 'absolute', top: 20, left: 20,
                                             bgcolor: THEME.danger, color: '#fff', fontWeight: 'bold', px: 1
@@ -223,25 +252,45 @@ export default function ProductDetails() {
 
                             {/* Action Buttons */}
                             <Stack direction="row" spacing={2}>
-                                <Button 
-                                    variant="contained" 
-                                    size="large" 
-                                    startIcon={!adding && <ShoppingCart />} 
-                                    disabled={adding || product.quantity <= 0} 
-                                    onClick={handleAddToCart} 
-                                    fullWidth
-                                    sx={{ 
-                                        bgcolor: THEME.primary, // Yellow
-                                        color: '#000', // Black Text
-                                        fontWeight: 800, 
-                                        py: 1.8, 
-                                        borderRadius: '12px',
-                                        '&:hover': { bgcolor: '#e6c200', boxShadow: '0 0 20px rgba(255, 215, 0, 0.3)' },
-                                        '&.Mui-disabled': { bgcolor: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.3)' }
-                                    }}
-                                >
-                                    {adding ? <CircularProgress size={24} color="inherit" /> : product.quantity > 0 ? 'ADD TO CART' : 'OUT OF STOCK'}
-                                </Button>
+                                {product.quantity > 0 ? (
+                                    <Button
+                                        variant="contained"
+                                        size="large"
+                                        startIcon={!adding && <ShoppingCart />}
+                                        disabled={adding}
+                                        onClick={handleAddToCart}
+                                        fullWidth
+                                        sx={{
+                                            bgcolor: THEME.primary, // Yellow
+                                            color: '#000', // Black Text
+                                            fontWeight: 800,
+                                            py: 1.8,
+                                            borderRadius: '12px',
+                                            '&:hover': { bgcolor: '#e6c200', boxShadow: '0 0 20px rgba(255, 215, 0, 0.3)' },
+                                            '&.Mui-disabled': { bgcolor: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.3)' }
+                                        }}
+                                    >
+                                        {adding ? <CircularProgress size={24} color="inherit" /> : 'ADD TO CART'}
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        variant="contained"
+                                        size="large"
+                                        startIcon={<Notifications />}
+                                        onClick={() => setRequestDialog(true)}
+                                        fullWidth
+                                        sx={{
+                                            bgcolor: THEME.primary, // Yellow
+                                            color: '#000', // Black Text
+                                            fontWeight: 800,
+                                            py: 1.8,
+                                            borderRadius: '12px',
+                                            '&:hover': { bgcolor: '#e6c200', boxShadow: '0 0 20px rgba(255, 215, 0, 0.3)' }
+                                        }}
+                                    >
+                                        Request Product
+                                    </Button>
+                                )}
                             </Stack>
 
                             {/* Trust Signals */}
@@ -260,6 +309,61 @@ export default function ProductDetails() {
                     </Grid>
                 </Grid>
             </Container>
+
+            {/* Request Dialog */}
+            <Dialog
+                open={requestDialog}
+                onClose={() => setRequestDialog(false)}
+                maxWidth="sm"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        bgcolor: '#1E293B',
+                        color: '#fff',
+                        borderRadius: '20px',
+                        border: `1px solid ${THEME.glassBorder}`
+                    }
+                }}
+            >
+                <DialogTitle sx={{ fontWeight: 700, borderBottom: `1px solid ${THEME.glassBorder}` }}>
+                    Request Product: {product?.name}
+                </DialogTitle>
+                <DialogContent sx={{ mt: 2 }}>
+                    <TextField
+                        fullWidth
+                        multiline
+                        rows={3}
+                        label="Optional Message"
+                        value={userMessage}
+                        onChange={(e) => setUserMessage(e.target.value)}
+                        sx={{
+                            '& .MuiInputBase-root': { color: '#fff', bgcolor: 'rgba(255,255,255,0.05)' },
+                            '& .MuiInputLabel-root': { color: THEME.textMuted },
+                            '& .MuiOutlinedInput-root': { '& fieldset': { borderColor: THEME.glassBorder } }
+                        }}
+                    />
+                </DialogContent>
+                <DialogActions sx={{ p: 3, borderTop: `1px solid ${THEME.glassBorder}` }}>
+                    <Button onClick={() => setRequestDialog(false)} sx={{ color: THEME.textMuted }}>Cancel</Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleRequestProduct}
+                        disabled={requesting}
+                        sx={{ bgcolor: THEME.primary, color: '#000', fontWeight: 'bold' }}
+                    >
+                        {requesting ? <CircularProgress size={20} color="inherit" /> : 'Send Request'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Snackbar */}
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={4000}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+                message={snackbar.message}
+            />
+
         </PageWrapper>
     );
 }
