@@ -262,23 +262,29 @@ export default function Dashboard() {
                 <Chip label="Last 7 Days" size="small" sx={{ bgcolor: alpha(THEME.primary, 0.2), color: THEME.primary }} />
               </Box>
               <Box height={300} width="100%" sx={{ minHeight: 300 }}>
-                <ResponsiveContainer>
-                  <AreaChart data={salesData}>
-                    <defs>
-                      <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={THEME.primary} stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor={THEME.primary} stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="name" stroke={THEME.textMuted} />
-                    <YAxis stroke={THEME.textMuted} />
-                    <Tooltip 
-                      contentStyle={{ backgroundColor: '#1E293B', border: 'none', borderRadius: '8px', color: '#fff' }}
-                    />
-                    <Area type="monotone" dataKey="revenue" stroke={THEME.primary} fillOpacity={1} fill="url(#colorRev)" />
-                  </AreaChart>
-                </ResponsiveContainer>
+                {salesData && salesData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={salesData}>
+                      <defs>
+                        <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor={THEME.primary} stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor={THEME.primary} stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                      <XAxis dataKey="name" stroke={THEME.textMuted} />
+                      <YAxis stroke={THEME.textMuted} />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: '#1E293B', border: 'none', borderRadius: '8px', color: '#fff' }}
+                      />
+                      <Area type="monotone" dataKey="revenue" stroke={THEME.primary} fillOpacity={1} fill="url(#colorRev)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+                    <Typography color={THEME.textMuted}>No data available</Typography>
+                  </Box>
+                )}
               </Box>
             </GlassCard>
 
@@ -373,17 +379,23 @@ export default function Dashboard() {
             <GlassCard>
               <Typography variant="h6" fontWeight={700} mb={2}>Order Status</Typography>
               <Box height={200} width="100%" sx={{ minHeight: 200 }}>
-                <ResponsiveContainer>
-                  <BarChart data={[
-                    { name: 'Delivered', val: stats.deliveredOrders },
-                    { name: 'Cancelled', val: stats.cancelledOrders },
-                    { name: 'Pending', val: stats.pendingOrders }
-                  ]}>
-                    <Tooltip cursor={{fill: 'transparent'}} contentStyle={{ backgroundColor: '#1E293B', border: 'none' }}/>
-                    <Bar dataKey="val" fill={THEME.primary} radius={[4, 4, 0, 0]} barSize={30} />
-                    <XAxis dataKey="name" stroke={THEME.textMuted} fontSize={12} />
-                  </BarChart>
-                </ResponsiveContainer>
+                {stats ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={[
+                      { name: 'Delivered', val: stats.deliveredOrders || 0 },
+                      { name: 'Cancelled', val: stats.cancelledOrders || 0 },
+                      { name: 'Pending', val: stats.pendingOrders || 0 }
+                    ]}>
+                      <Tooltip cursor={{fill: 'transparent'}} contentStyle={{ backgroundColor: '#1E293B', border: 'none' }}/>
+                      <Bar dataKey="val" fill={THEME.primary} radius={[4, 4, 0, 0]} barSize={30} />
+                      <XAxis dataKey="name" stroke={THEME.textMuted} fontSize={12} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+                    <Typography color={THEME.textMuted}>Loading...</Typography>
+                  </Box>
+                )}
               </Box>
             </GlassCard>
 
