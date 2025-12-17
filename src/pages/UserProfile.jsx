@@ -357,7 +357,7 @@
 
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box, Container, Grid, Typography, Button, Paper, Avatar,
   List, ListItemButton, ListItemIcon, ListItemText, Divider,
@@ -373,7 +373,8 @@ import {
   Star as StarIcon,
   ChevronRight as ArrowIcon,
   Phone as PhoneIcon,
-  Email as EmailIcon
+  Email as EmailIcon,
+  Inbox as InboxIcon
 } from '@mui/icons-material';
 
 // -(Theme Settings) ---
@@ -390,6 +391,8 @@ const THEME = {
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState('overview');
+  const [requests, setRequests] = useState([]);
+  const [loadingRequests, setLoadingRequests] = useState(false);
 
   // (Dummy Data based on your screenshot)
   const user = {
@@ -398,8 +401,26 @@ const ProfilePage = () => {
     phone: "+94 77 123 4567",
     membership: "Gold Member",
     balance: "Rs 12,450.00",
-    avatar: "https://www.freepik.com/free-photos-vectors/avatar" 
+    avatar: "https://www.freepik.com/free-photos-vectors/avatar"
   };
+
+  const loadRequests = async () => {
+    try {
+      setLoadingRequests(true);
+      const response = await api.get('/product-requests/my');
+      setRequests(response.data.requests || []);
+    } catch (error) {
+      console.error('Error loading requests:', error);
+    } finally {
+      setLoadingRequests(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'requests') {
+      loadRequests();
+    }
+  }, [activeTab]);
 
   // --- Components ---
 
@@ -575,6 +596,7 @@ const ProfilePage = () => {
               <List disablePadding>
                 <SidebarItem icon={<PersonIcon />} label="Profile Overview" value="overview" />
                 <SidebarItem icon={<OrderIcon />} label="My Orders" value="orders" />
+                <SidebarItem icon={<InboxIcon />} label="My Requests" value="requests" />
                 <SidebarItem icon={<AddressIcon />} label="Addresses" value="address" />
                 <SidebarItem icon={<WalletIcon />} label="Wallet" value="wallet" />
               </List>
@@ -600,6 +622,77 @@ const ProfilePage = () => {
                   <OrderIcon sx={{ fontSize: 60, color: '#333', mb: 2 }} />
                   <Typography sx={{ color: THEME.textGray }}>No recent orders found</Typography>
                   <Button sx={{ mt: 2, color: THEME.yellow }}>Start Shopping</Button>
+                </Box>
+              )}
+
+              {activeTab === 'requests' && (
+                <Box>
+                  <Typography variant="h5" sx={{ color: THEME.text, fontWeight: 'bold', mb: 3 }}>
+                    My Product Requests
+                  </Typography>
+                  {loadingRequests ? (
+                    <Box sx={{ textAlign: 'center', py: 5 }}>
+                      <Typography sx={{ color: THEME.textGray }}>Loading requests...</Typography>
+                    </Box>
+                  ) : requests.length === 0 ? (
+                    <Box sx={{ textAlign: 'center', py: 5 }}>
+                      <InboxIcon sx={{ fontSize: 60, color: '#333', mb: 2 }} />
+                      <Typography sx={{ color: THEME.textGray }}>No product requests found</Typography>
+                      <Button sx={{ mt: 2, color: THEME.yellow }}>Request a Product</Button>
+                    </Box>
+                  ) : (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      {requests.map((request) => (
+                        <Paper key={request._id} sx={{
+                          p: 3,
+                          bgcolor: '#252525',
+                          borderRadius: 3,
+                          border: '1px solid #333'
+                        }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                            <Typography variant="h6" sx={{ color: THEME.yellow, fontWeight: 'bold' }}>
+                              {request.productName}
+                            </Typography>
+                            <Chip
+                              label={request.status}
+                              sx={{
+                                bgcolor: request.status === 'approved' ? 'rgba(76, 175, 80, 0.1)' :
+                                       request.status === 'rejected' ? 'rgba(244, 67, 54, 0.1)' :
+                                       'rgba(255, 193, 7, 0.1)',
+                                color: request.status === 'approved' ? '#4CAF50' :
+                                       request.status === 'rejected' ? '#F44336' :
+                                       '#FFC107',
+                                fontWeight: 'bold'
+                              }}
+                            />
+                          </Box>
+                          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            <Box sx={{ p: 2, bgcolor: '#1E1E1E', borderRadius: 2 }}>
+                              <Typography variant="body2" sx={{ color: THEME.textGray, mb: 1 }}>
+                                <strong>You:</strong>
+                              </Typography>
+                              <Typography sx={{ color: THEME.text }}>
+                                {request.message}
+                              </Typography>
+                            </Box>
+                            {request.replyMessage && (
+                              <Box sx={{ p: 2, bgcolor: 'rgba(255, 193, 7, 0.1)', borderRadius: 2, border: '1px solid rgba(255, 193, 7, 0.3)' }}>
+                                <Typography variant="body2" sx={{ color: THEME.yellow, mb: 1 }}>
+                                  <strong>Admin:</strong>
+                                </Typography>
+                                <Typography sx={{ color: THEME.text }}>
+                                  {request.replyMessage}
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: THEME.textGray, mt: 1, display: 'block' }}>
+                                  Replied on {new Date(request.repliedAt).toLocaleDateString()}
+                                </Typography>
+                              </Box>
+                            )}
+                          </Box>
+                        </Paper>
+                      ))}
+                    </Box>
+                  )}
                 </Box>
               )}
 
