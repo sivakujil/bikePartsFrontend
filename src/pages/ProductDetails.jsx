@@ -123,10 +123,15 @@ export default function ProductDetails() {
             setError("Please login to request products");
             return;
         }
+        const productId = product._id || product.id;
+        if (!productId) {
+            setError("Product ID not available");
+            return;
+        }
         setRequesting(true);
         try {
             await submitProductRequest({
-                productId: product._id,
+                productId,
                 messageFromUser: userMessage
             });
             setSnackbar({ open: true, message: "Request sent to admin" });
