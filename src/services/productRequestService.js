@@ -1,14 +1,15 @@
 import api from './api.js';
 
 /**
- * Create a product request
+ * Submit a product request
  * @param {Object} requestData - The product request data
- * @param {string} requestData.productId - ID of the product
+ * @param {string} requestData.productId - ID of the product (optional)
  * @param {string} requestData.productName - Name of the requested product
- * @param {string} requestData.userMessage - Optional user message
+ * @param {string} requestData.description - Description of the request
+ * @param {string} requestData.userId - User ID (optional, from context)
  * @returns {Promise<Object>} Response from the server
  */
-export const createProductRequest = async (requestData) => {
+export const submitProductRequest = async (requestData) => {
   try {
     const response = await api.post('/product-requests', requestData);
     return response.data;
@@ -63,7 +64,7 @@ export const replyToProductRequest = async (requestId, adminReply) => {
 };
 
 export default {
-  createProductRequest,
+  submitProductRequest,
   getUserProductRequests,
   getAllProductRequests,
   replyToProductRequest
