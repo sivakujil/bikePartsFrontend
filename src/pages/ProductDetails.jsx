@@ -13,6 +13,7 @@ import {
 import api from "../services/api";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
+import { createProductRequest } from "../services/productRequestService";
 
 // === 1. THEME (Sleek Yellow & Black) ===
 const THEME = {
@@ -124,7 +125,7 @@ export default function ProductDetails() {
         }
         setRequesting(true);
         try {
-            await api.post("/requests/create", {
+            await createProductRequest({
                 productId: product._id,
                 productName: product.name,
                 userMessage

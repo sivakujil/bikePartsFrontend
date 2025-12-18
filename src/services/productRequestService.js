@@ -10,7 +10,7 @@ import api from './api.js';
  */
 export const createProductRequest = async (requestData) => {
   try {
-    const response = await api.post('/requests/create', requestData);
+    const response = await api.post('/product-requests', requestData);
     return response.data;
   } catch (error) {
     console.error('Error creating product request:', error);
@@ -24,7 +24,7 @@ export const createProductRequest = async (requestData) => {
  */
 export const getUserProductRequests = async () => {
   try {
-    const response = await api.get('/requests/user');
+    const response = await api.get('/product-requests/my');
     return response.data;
   } catch (error) {
     console.error('Error fetching user product requests:', error);
@@ -38,7 +38,7 @@ export const getUserProductRequests = async () => {
  */
 export const getAllProductRequests = async () => {
   try {
-    const response = await api.get('/requests/admin');
+    const response = await api.get('/product-requests/admin');
     return response.data;
   } catch (error) {
     console.error('Error fetching all product requests:', error);
@@ -54,7 +54,7 @@ export const getAllProductRequests = async () => {
  */
 export const replyToProductRequest = async (requestId, adminReply) => {
   try {
-    const response = await api.put(`/requests/reply/${requestId}`, { adminReply });
+    const response = await api.put(`/product-requests/reply/${requestId}`, { adminReply });
     return response.data;
   } catch (error) {
     console.error('Error replying to product request:', error);
