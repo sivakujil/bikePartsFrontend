@@ -130,14 +130,17 @@ export default function ProductDetails() {
         }
         setRequesting(true);
         try {
-            await submitProductRequest({
+            const payload = {
                 productId,
                 messageFromUser: userMessage
-            });
+            };
+            console.log('Frontend request payload:', payload);
+            await submitProductRequest(payload);
             setSnackbar({ open: true, message: "Request sent to admin" });
             setRequestDialog(false);
             setUserMessage("");
         } catch (err) {
+            console.error('Failed to send request:', err.response?.data || err);
             setError("Failed to send request");
         } finally {
             setRequesting(false);

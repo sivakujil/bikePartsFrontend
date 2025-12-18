@@ -9,10 +9,13 @@ import api from './api.js';
  */
 export const submitProductRequest = async (requestData) => {
   try {
+    console.log('Frontend request payload:', requestData);
     const response = await api.post('/product-requests', requestData);
+    console.log('Create request response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error creating product request:', error);
+    console.error('Error response:', error.response?.data || error);
     throw error;
   }
 };
