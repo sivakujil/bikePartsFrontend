@@ -93,8 +93,8 @@ export default function MyRequests() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "Replied": return THEME.success;
-      case "Pending": return THEME.primary;
+      case "replied": return THEME.success;
+      case "pending": return THEME.primary;
       default: return THEME.textMuted;
     }
   };
@@ -134,6 +134,7 @@ export default function MyRequests() {
                   <TableCell>Status</TableCell>
                   <TableCell>Submitted</TableCell>
                   <TableCell>Admin Reply</TableCell>
+                  <TableCell>Estimated Date</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -142,11 +143,11 @@ export default function MyRequests() {
                     <TableCell>
                       <Box>
                         <Typography variant="body2" fontWeight={700} color={THEME.primary}>
-                          {request.productName}
+                          {request.productId?.name}
                         </Typography>
-                        {request.userMessage && (
+                        {request.messageFromUser && (
                           <Typography variant="caption" color={THEME.textMuted} sx={{ display: 'block', mt: 0.5 }}>
-                            {request.userMessage}
+                            {request.messageFromUser}
                           </Typography>
                         )}
                       </Box>
@@ -173,6 +174,17 @@ export default function MyRequests() {
                       ) : (
                         <Typography variant="body2" color={THEME.textMuted}>
                           No reply yet
+                        </Typography>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {request.estimatedDate ? (
+                        <Typography variant="body2" color={THEME.text}>
+                          {format(new Date(request.estimatedDate), "MMM dd, yyyy")}
+                        </Typography>
+                      ) : (
+                        <Typography variant="body2" color={THEME.textMuted}>
+                          Not set
                         </Typography>
                       )}
                     </TableCell>

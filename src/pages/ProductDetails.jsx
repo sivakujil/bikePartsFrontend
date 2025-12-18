@@ -127,8 +127,7 @@ export default function ProductDetails() {
         try {
             await submitProductRequest({
                 productId: product._id,
-                productName: product.name,
-                userMessage
+                messageFromUser: userMessage
             });
             setSnackbar({ open: true, message: "Request sent to admin" });
             setRequestDialog(false);

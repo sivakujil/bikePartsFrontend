@@ -3,10 +3,8 @@ import api from './api.js';
 /**
  * Submit a product request
  * @param {Object} requestData - The product request data
- * @param {string} requestData.productId - ID of the product (optional)
- * @param {string} requestData.productName - Name of the requested product
- * @param {string} requestData.description - Description of the request
- * @param {string} requestData.userId - User ID (optional, from context)
+ * @param {string} requestData.productId - ID of the product
+ * @param {string} requestData.messageFromUser - Message from user (optional)
  * @returns {Promise<Object>} Response from the server
  */
 export const submitProductRequest = async (requestData) => {
@@ -25,7 +23,7 @@ export const submitProductRequest = async (requestData) => {
  */
 export const getUserProductRequests = async () => {
   try {
-    const response = await api.get('/product-requests/my');
+    const response = await api.get('/product-requests/mine');
     return response.data;
   } catch (error) {
     console.error('Error fetching user product requests:', error);
@@ -39,7 +37,7 @@ export const getUserProductRequests = async () => {
  */
 export const getAllProductRequests = async () => {
   try {
-    const response = await api.get('/product-requests/admin');
+    const response = await api.get('/product-requests');
     return response.data;
   } catch (error) {
     console.error('Error fetching all product requests:', error);
@@ -50,12 +48,13 @@ export const getAllProductRequests = async () => {
 /**
  * Reply to product request (admin)
  * @param {string} requestId - ID of the request
- * @param {string} adminReply - Admin reply message
+ * @param {string} adminReply - Admin reply message (optional)
+ * @param {string} estimatedDate - Estimated availability date (optional)
  * @returns {Promise<Object>} Response from the server
  */
-export const replyToProductRequest = async (requestId, adminReply) => {
+export const replyToProductRequest = async (requestId, adminReply, estimatedDate) => {
   try {
-    const response = await api.put(`/product-requests/reply/${requestId}`, { adminReply });
+    const response = await api.patch(`/product-requests/${requestId}/reply`, { adminReply, estimatedDate });
     return response.data;
   } catch (error) {
     console.error('Error replying to product request:', error);

@@ -123,6 +123,7 @@ export default function ProductRequests() {
   const [replyDialog, setReplyDialog] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [replyMessage, setReplyMessage] = useState("");
+  const [estimatedDate, setEstimatedDate] = useState("");
 
   useEffect(() => { loadRequests(); }, []);
   useEffect(() => { applyFilters(); }, [requests, search, tabValue]);
@@ -140,14 +141,14 @@ export default function ProductRequests() {
     let filtered = [...requests];
 
     // Tab Filter
-    if (tabValue === 1) filtered = filtered.filter(r => r.status === 'Pending');
-    if (tabValue === 2) filtered = filtered.filter(r => r.status === 'Replied');
+    if (tabValue === 1) filtered = filtered.filter(r => r.status === 'pending');
+    if (tabValue === 2) filtered = filtered.filter(r => r.status === 'replied');
 
     // Search Filter
     if (search) {
       filtered = filtered.filter(request =>
-        request.productName?.toLowerCase().includes(search.toLowerCase()) ||
-        request.userMessage?.toLowerCase().includes(search.toLowerCase()) ||
+        request.productId?.name?.toLowerCase().includes(search.toLowerCase()) ||
+        request.messageFromUser?.toLowerCase().includes(search.toLowerCase()) ||
         request.userId?.name?.toLowerCase().includes(search.toLowerCase()) ||
         request.userId?.email?.toLowerCase().includes(search.toLowerCase())
       );
@@ -157,13 +158,13 @@ export default function ProductRequests() {
 
 
   const handleReply = async () => {
-    if (!selectedRequest || !replyMessage.trim()) return;
     try {
-      await replyToProductRequest(selectedRequest._id, replyMessage);
+      await replyToProductRequest(selectedRequest._id, replyMessage, estimatedDate);
       loadRequests();
       setReplyDialog(false);
       setSelectedRequest(null);
       setReplyMessage("");
+      setEstimatedDate("");
     } catch (error) { console.error(error); }
   };
 
@@ -179,29 +180,30 @@ export default function ProductRequests() {
   const openReplyDialog = (request) => {
     setSelectedRequest(request);
     setReplyMessage(request.adminReply || "");
+    setEstimatedDate(request.estimatedDate ? request.estimatedDate.split('T')[0] : "");
     setReplyDialog(true);
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "Replied": return THEME.success;
-      case "Pending": return THEME.primary;
+      case "replied": return THEME.success;
+      case "pending": return THEME.primary;
       default: return THEME.textMuted;
     }
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case "Replied": return <CheckCircle fontSize="small" />;
-      case "Pending": return <Pending fontSize="small" />;
+      case "replied": return <CheckCircle fontSize="small" />;
+      case "pending": return <Pending fontSize="small" />;
       default: return null;
     }
   };
 
   const stats = {
     total: requests.length,
-    pending: requests.filter(r => r.status === 'Pending').length,
-    replied: requests.filter(r => r.status === 'Replied').length
+    pending: requests.filter(r => r.status === 'pending').length,
+    replied: requests.filter(r => r.status === 'replied').length
   };
 
   if (loading) return <Box sx={{ bgcolor: THEME.bg, height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}><LinearProgress sx={{ width: 200, color: THEME.primary }} /></Box>;
@@ -280,10 +282,10 @@ export default function ProductRequests() {
                     <TableCell>
                       <Box>
                         <Typography variant="body2" fontWeight={700} color={THEME.primary}>
-                          {request.productName}
+                          {request.productId?.name}
                         </Typography>
                         <Typography variant="caption" color={THEME.textMuted} sx={{ display: 'block', mt: 0.5 }}>
-                          {request.userMessage && (request.userMessage.length > 100 ? `${request.userMessage.substring(0, 100)}...` : request.userMessage)}
+                          {request.messageFromUser && (request.messageFromUser.length > 100 ? `${request.messageFromUser.substring(0, 100)}...` : request.messageFromUser)}
                         </Typography>
                       </Box>
                     </TableCell>
@@ -365,10 +367,10 @@ export default function ProductRequests() {
           </DialogTitle>
           <DialogContent sx={{ mt: 2 }}>
             <Typography variant="body2" color={THEME.textMuted} sx={{ mb: 2 }}>
-              Product: {selectedRequest?.productName}
+              Product: {selectedRequest?.productId?.name}
             </Typography>
             <Typography variant="body2" color={THEME.textMuted} sx={{ mb: 2 }}>
-              User Message: {selectedRequest?.userMessage || "No message"}
+              User Message: {selectedRequest?.messageFromUser || "No message"}
             </Typography>
             <TextField
               fullWidth
@@ -378,6 +380,21 @@ export default function ProductRequests() {
               label="Admin Reply Message"
               value={replyMessage}
               onChange={(e) => setReplyMessage(e.target.value)}
+              sx={{
+                '& .MuiInputBase-root': { color: '#fff', bgcolor: alpha('#fff', 0.05) },
+                '& .MuiInputLabel-root': { color: THEME.textMuted },
+                '& .MuiFilledInput-root': { bgcolor: alpha('#fff', 0.05) },
+                mb: 2
+              }}
+            />
+            <TextField
+              fullWidth
+              type="date"
+              variant="filled"
+              label="Estimated Availability Date"
+              value={estimatedDate}
+              onChange={(e) => setEstimatedDate(e.target.value)}
+              InputLabelProps={{ shrink: true }}
               sx={{
                 '& .MuiInputBase-root': { color: '#fff', bgcolor: alpha('#fff', 0.05) },
                 '& .MuiInputLabel-root': { color: THEME.textMuted },
