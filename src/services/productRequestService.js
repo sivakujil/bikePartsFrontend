@@ -3,8 +3,9 @@ import api from './api.js';
 /**
  * Submit a product request
  * @param {Object} requestData - The product request data
- * @param {string} requestData.productId - ID of the product
- * @param {string} requestData.messageFromUser - Message from user (optional)
+ * @param {string} [requestData.productId] - ID of the existing product (optional)
+ * @param {string} [requestData.productName] - Name of the product to request (required if productId not provided)
+ * @param {string} [requestData.description] - Description or message from user (optional)
  * @returns {Promise<Object>} Response from the server
  */
 export const submitProductRequest = async (requestData) => {

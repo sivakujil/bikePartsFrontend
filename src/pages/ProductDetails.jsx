@@ -132,7 +132,7 @@ export default function ProductDetails() {
         try {
             const payload = {
                 productId,
-                messageFromUser: userMessage
+                description: userMessage
             };
             console.log('Frontend request payload:', payload);
             await submitProductRequest(payload);
